@@ -1,0 +1,73 @@
+.service-options {
+    position: relative;
+    z-index: 1000;
+}
+
+#totalPrice {
+    transition: all 0.5s ease;
+}
+
+#sidebar {
+    transition: margin-top 0.1s ease;
+}
+
+.sticky-popup,
+.sticky-popup-visible {
+    position: fixed;
+    bottom: 10px; /* margin på botten */
+    left: 0;
+    right: 0;
+    background-color: #343a40;
+    color: #fff;
+    padding: 10px 20px;
+    text-align: center;
+    border-radius: 10px; /* rundade kanter */
+    z-index: 9999;
+
+    /* Om den är dold börjar vi med att anta att den inte visas */
+    display: none;
+}
+
+.sticky-popup-visible {
+    display: block; /* visa när det är synligt */
+}
+
+/* Mobil enhet stil */
+@media (max-width: 576px) { /* Bootstrap breakpoint för små enheter */
+    .sticky-popup,
+    .sticky-popup-visible {
+        margin-left: 20px; /* margin på vänster */
+        margin-right: 20px; /* margin på höger */
+    }
+}
+
+/* Desktop stil */
+@media (min-width: 576px) { /* Bootstrap breakpoint för medelstora enheter och uppåt */
+    .sticky-popup,
+    .sticky-popup-visible {
+        left: 50%; /* centrerar bar */
+        transform: translateX(-50%); /* centrerar baserat på egen bredd */
+        max-width: 540px; /* Bootstrap container bredd för medelstora enheter */
+    }
+}
+
+@media (min-width: 768px) { /* Bootstrap breakpoint för medelstora enheter */
+    .sticky-popup,
+    .sticky-popup-visible {
+        max-width: 720px; /* Bootstrap container bredd för medelstora enheter */
+    }
+}
+
+@media (min-width: 992px) { /* Bootstrap breakpoint för stora enheter */
+    .sticky-popup,
+    .sticky-popup-visible {
+        max-width: 960px; /* Bootstrap container bredd för stora enheter */
+    }
+}
+
+@media (min-width: 1200px) { /* Bootstrap breakpoint för extra stora enheter */
+    .sticky-popup,
+    .sticky-popup-visible {
+        max-width: 1140px; /* Bootstrap container bredd för extra stora enheter */
+    }
+}
