@@ -40,11 +40,9 @@
                                         @endif
                                     @endif
 
-                                    @if($service['is_rut'])
-                                        <span class="d-block fs-6 text-success">RUT-berättigad</span>
-                                    @endif
-                                    @if($service['is_rot'])
-                                        <span class="d-block fs-6 text-warning">ROT-berättigad</span>
+                                    @if($service['customer_materials'] === 'yes')
+                                        <span
+                                            class="fw-medium">Har eget material:</span> {{ $service['has_material'] ? 'Ja' : 'Nej' }}
                                     @endif
 
                                     @if (count($service['options']) > 0)
@@ -65,9 +63,11 @@
                                         </p>
                                     @endif
 
-                                    @if($service['customer_materials'] === 'yes')
-                                        <span
-                                            class="fw-medium">Har eget material:</span> {{ $service['has_material'] ? 'Ja' : 'Nej' }}
+                                    @if($service['is_rut'])
+                                        <span class="d-block fs-6 text-success">RUT-berättigad</span>
+                                    @endif
+                                    @if($service['is_rot'])
+                                        <span class="d-block fs-6 text-warning">ROT-berättigad</span>
                                     @endif
 
                                     <div class="mt-3">
