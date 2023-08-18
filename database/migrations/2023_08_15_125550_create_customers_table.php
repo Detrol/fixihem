@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('customer_phone');
             $table->timestamps();
 
-            $table->foreign('order_id')->references('order_id')->on('bookings');
+            //$table->foreign('order_id')->references('order_id')->on('bookings');
         });
     }
 
