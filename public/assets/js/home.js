@@ -1,50 +1,61 @@
 $(document).ready(function() {
+    $('#stickyPopup').hide();
 
-    function calculateServicePrice(serviceElement) {
-        let basePrice = parseFloat(serviceElement.data('price'));
+    function calculateEstimatedTime(serviceElement) {
+        let quantity = parseFloat(serviceElement.closest('.service-wrapper').find('input[type="number"]').val()) || 1;
+        let baseTime = parseFloat(serviceElement.data('estimated-minutes')) || 0;
         let serviceType = serviceElement.data('type');
-        let materialPrice = parseFloat(serviceElement.data('material-price'));
-        let price = basePrice;
+        let time = baseTime * quantity;
 
-        if (serviceType === 'quantity' || serviceType === 'drive') {
-            let quantity = parseFloat(serviceElement.closest('.service-wrapper').find('input[type="number"]').val()) || 1;
+        // Hantera tjänstalternativens tid
+        serviceElement.closest('.service-wrapper').find('.form-check-input[name="options[]"]:checked').each(function() {
+            let optionTime = parseFloat($(this).data('estimated-minutes')) || 0;
+            let optionHasQuantity = parseInt($(this).data('has-quantity'), 10) === 1;
+            let optionQuantity;
 
-            price *= quantity;
-            price += materialPrice * quantity;
-
-            if (serviceElement.closest('.service-wrapper').find('.has-material').prop('checked')) {
-                price -= materialPrice * quantity;
+            if(optionHasQuantity) {
+                optionQuantity = parseFloat($(this).closest('.form-check').find('input[type="number"]').val()) || 1;
+            } else {
+                optionQuantity = 1;
             }
 
-            serviceElement.closest('.service-wrapper').find('.form-check-input[name="options[]"]:checked').each(function() {
-                let optionPrice = parseFloat($(this).data('price'));
-                if (!serviceElement.closest('.service-wrapper').find('.has-material').prop('checked')) {
-                    price += optionPrice * quantity;
-                }
-            });
-        }
+            if (serviceType === 'quantity' || serviceType === 'drive') {
+                time += optionTime * quantity;
+            } else {
+                time += optionTime * optionQuantity;
+            }
+        });
 
-        return price;
+        return time;
     }
 
-    function updateTotalPrice() {
-        let totalPrice = 0;
+
+
+    function minutesToHoursMinutes(minutes) {
+        if (minutes < 60) {
+            return minutes + " min";
+        }
+
+        let h = Math.floor(minutes / 60);
+        let m = minutes % 60;
+
+        return h + " tim" + (m ? " " + m + " min" : "");
+    }
+
+    function updateTotalTime() {
+        let totalTime = 0;
         let anyServiceChecked = false;
 
         $(".service-checkbox:checked").each(function() {
             anyServiceChecked = true;
-            let individualPrice = calculateServicePrice($(this));
-            totalPrice += individualPrice;
+            let individualTime = calculateEstimatedTime($(this));
+            totalTime += individualTime;
         });
 
-        if (totalPrice < 300) {
-            totalPrice = 300;
-        }
+        animateTimeChange($('#totalTime').data('current-time') || 0, totalTime);
 
-        animatePriceChange($('#totalPrice').data('current-price') || 0, totalPrice);
-
-        let priceText = "Preliminärt pris";
-        $('#rutText').html(priceText + ": ");
+        let timeText = "Uppskattad tid";
+        $('#rutText').html(timeText + ": ");
 
         if(anyServiceChecked) {
             $('#stickyPopup').fadeIn();
@@ -55,24 +66,24 @@ $(document).ready(function() {
 
     let currentInterval = null;
 
-    function animatePriceChange(currentPrice, newPrice) {
+    function animateTimeChange(currentTime, newTime) {
         if (currentInterval) {
             clearInterval(currentInterval);
         }
 
         let duration = 500;
-        let difference = newPrice - currentPrice;
+        let difference = newTime - currentTime;
         let step = difference / (duration / 10);
-        let current = currentPrice;
+        let current = currentTime;
 
         currentInterval = setInterval(function() {
             current += step;
-            if ((step > 0 && current >= newPrice) || (step < 0 && current <= newPrice)) {
+            if ((step > 0 && current >= newTime) || (step < 0 && current <= newTime)) {
                 clearInterval(currentInterval);
-                current = newPrice;
+                current = newTime;
             }
 
-            $('#totalPrice').text(current.toFixed(2)).data('current-price', current);
+            $('#totalTime').text(minutesToHoursMinutes(Math.round(current))).data('current-time', current);
         }, 10);
     }
 
@@ -85,15 +96,27 @@ $(document).ready(function() {
             $(this).closest('.service-wrapper').find('.service-options').slideUp();
         }
 
-        updateTotalPrice();
+        updateTotalTime();
     });
 
     $(document).on('change input', '.service-options input', function() {
-        updateTotalPrice();
+        updateTotalTime();
     });
 
     $(document).on('change', '.has-material', function() {
-        updateTotalPrice();
+        updateTotalTime();
     });
 
+    $('.form-check-input[name="options[]"]').change(function() {
+        let quantityFieldWrapper = $(this).closest('.form-check').find('.option-quantity-wrapper');
+        let quantityField = quantityFieldWrapper.find('input[type="number"]');
+
+        if ($(this).prop('checked')) {
+            quantityFieldWrapper.slideDown(400);
+        } else {
+            quantityFieldWrapper.slideUp(function() {
+                quantityField.val(1);
+            });
+        }
+    });
 });

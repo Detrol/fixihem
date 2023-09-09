@@ -3,6 +3,11 @@
     z-index: 1000;
 }
 
+.service-name {
+    position: relative;
+    z-index: 2000;
+}
+
 #totalPrice {
     transition: all 0.5s ease;
 }
@@ -14,17 +19,11 @@
 .sticky-popup,
 .sticky-popup-visible {
     position: fixed;
-    bottom: 10px; /* margin på botten */
-    left: 0;
-    right: 0;
-    background-color: #343a40;
-    color: #fff;
+    bottom: 10px;
+    left: 50%; /* centrerar elementet horisontellt */
+    transform: translateX(-50%); /* justerar för elementets egen bredd */
     padding: 10px 20px;
-    text-align: center;
-    border-radius: 10px; /* rundade kanter */
     z-index: 9999;
-
-    /* Om den är dold börjar vi med att anta att den inte visas */
     display: none;
 }
 
@@ -32,10 +31,20 @@
     display: block; /* visa när det är synligt */
 }
 
+@media (max-width: 576px) { /* Bootstrap breakpoint för små enheter */
+    .sticky-popup,
+    .sticky-popup-visible {
+        width: 95%; /* Sätt bredden till 95% */
+        left: 2.5%; /* Centrerar elementet horisontellt (100% - 95%) / 2 = 2.5% på varje sida */
+        transform: none; /* Eftersom vi använder procentuella värden för centreringsändamål, behöver vi inte transformera längre */
+    }
+}
+
 /* Mobil enhet stil */
 @media (max-width: 576px) { /* Bootstrap breakpoint för små enheter */
     .sticky-popup,
     .sticky-popup-visible {
+        width: auto; /* Återställer bredden */
         margin-left: 20px; /* margin på vänster */
         margin-right: 20px; /* margin på höger */
     }
@@ -69,5 +78,24 @@
     .sticky-popup,
     .sticky-popup-visible {
         max-width: 1140px; /* Bootstrap container bredd för extra stora enheter */
+    }
+}
+
+@media (max-width: 576px) { /* Bootstrap breakpoint för små enheter */
+
+    .go-forward-btn {
+        padding: 0; /* Ta bort padding */
+        width: 40px; /* Sätt en fast bredd */
+        height: 40px; /* Sätt en fast höjd */
+        border-radius: 50%; /* Gör knappen rund */
+        text-align: center; /* Centrera ikonen */
+    }
+
+    .go-forward-btn .fa-angle-right {
+        margin: 0; /* Ta bort marginal från ikonen */
+    }
+
+    .go-forward-btn span {
+        display: none; /* Göm texten */
     }
 }

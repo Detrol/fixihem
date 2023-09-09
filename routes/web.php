@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BookingController;
 use Illuminate\Support\Facades\Route;
 
@@ -37,6 +38,33 @@ Route::group(['middleware' => ['web']], function() {
 
     Route::post('/store', [BookingController::class, 'store'])->name('booking.store');
 
+});
+
+Route::get('/admin/login', [AdminController::class, 'showLoginForm'])->name('admin.login.form');
+Route::post('/admin/login', [AdminController::class, 'login'])->name('admin.login');
+
+Route::prefix('admin')->middleware('is.admin', 'AdminMiddleware')->group(function () {
+    Route::get('/', [AdminController::class, 'index']);
+    Route::get('today', [AdminController::class, 'today'])->name('today');
+    Route::get('reserved', [AdminController::class, 'reserved'])->name('reserved');
+    Route::get('bookings/{status}', [AdminController::class, 'bookings'])->name('bookings');
+
+    Route::get('order_details', [AdminController::class, 'order_details'])->name('order_details');
+    Route::get('/admin/order/{order}/invoice-text', [AdminController::class, 'generateInvoiceText'])->name('admin.order.invoice-text');
+
+    Route::get('order_accept/{order_id}', [AdminController::class, 'order_accept'])->name('order_accept');
+    Route::get('order_abort/{order_id}', [AdminController::class, 'order_abort'])->name('order_abort');
+    Route::get('order_completed/{order_id}', [AdminController::class, 'order_completed'])->name('order_completed');
+    Route::get('order_invoiced/{order_id}', [AdminController::class, 'order_invoiced'])->name('order_invoiced');
+    Route::get('order_paid/{order_id}', [AdminController::class, 'order_paid'])->name('order_paid');
+    Route::get('order_pause/{order_id}', [AdminController::class, 'order_pause'])->name('order_pause');
+
+    Route::get('order_start_time/{order_id}', [AdminController::class, 'order_start_time'])->name('order_start_time');
+    Route::get('order_stop_time/{order_id}', [AdminController::class, 'order_stop_time'])->name('order_stop_time');
+
+    Route::get('/order_text/{order_id}', [AdminController::class, 'order_text'])->name('order_text');
+
+    Route::post('logout', [AdminController::class, 'logout'])->name('admin.logout');
 });
 
 

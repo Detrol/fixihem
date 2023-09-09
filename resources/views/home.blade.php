@@ -16,7 +16,10 @@
                     <p>
                         Med Fixihem behöver du inte längre oroa dig för dessa uppgifter. Jag tar hand om dem åt dig, så att ditt hem inte bara blir skinande rent,
                         utan också mer funktionellt och bekvämt.
-                        Varje detalj räknas, och inget uppdrag är för litet för mig.
+                        Varje detalj räknas.
+                    </p>
+                    <p>
+                        Alla tjänster jag erbjuder är <strong>RUT-berättigade</strong>. Priset är <strong>299 kr/timma</strong>, inklusive RUT-avdrag. Det gör det både prisvärt och enkelt för dig.
                     </p>
                     <h5>Exempel på tjänster:</h5>
                     <ul class="list-unstyled">
@@ -24,10 +27,10 @@
                         <li><i class="fas fa-recycle"></i> Köra skräp och kläder till återvinning</li>
                         <li><i class="fas fa-water"></i> Rengöring av avlopp och vattenlås</li>
                         <li><i class="fas fa-shower"></i> Kalkborttagning på duschväggar</li>
-                        <li><i class="fas fa-window-maximize"></i> Byta eller installera lister i fönster</li>
+                        <li><i class="fas fa-computer-classic"></i> Felsökning och problemlösning på din dator</li>
                     </ul>
-
                 </div>
+
                 <!-- End Col -->
 
                 <div class="col-lg-6">
@@ -119,14 +122,14 @@
                 <div class="small pb-4">
                     Innan du bokar mina tjänster, vänligen beakta följande:
                     <ul class="pl-3">
-                        <li>Fakturering sker med ett minimibelopp om <strong>300 kr</strong>.</li>
-                        <li>Om tjänsten innefattar transport av skräp eller kläder till återbruk, kan reseersättning tillkomma. Denna avgift beror på avståndet till din närmaste servicepunkt eller återvinningsstation. Systemet räknar ut detta automatiskt vid bokningens slut och visar både avstånd och reseersättning.</li>
-                        <li>Tänk på att jag kör en kombi när jag utför tjänster som kräver resor till återvinningscentraler. Om du har stora föremål eller mycket skräp att transportera, kan jag vid behov hyra ett släp. Om skräpet är i påsar, vänligen sortera det i förväg. Observera att jag arbetar ensam och därför inte kan hantera för stora och tunga föremål.</li>
-                        <li>Alla priser på hemsidan presenteras inklusive RUT eller ROT-avdrag, alternativt utan avdrag. Nedan ser du vilka tjänster som kvalificerar sig för respektive avdrag.</li>
+                        <li>Fakturering: Minimibelopp <strong>300 kr</strong>.</li>
+                        <li>Transport av skräp/kläder kan medföra extra kostnad. Tiden och avgiften baseras på avståndet till närmaste återvinningsstation. Detta räknas automatiskt ut i sista bokningssteget.</li>
+                        <li>Jag kör en kombi för transport. Om du har mycket skräp kan ett släp hyras, välj då till Släp(nätgrind) nedan. Vänligen sortera skräp i förväg. Observera att jag inte kan hantera mycket tunga eller stora föremål på egen hand.</li>
+                        <li>I nästa steg kan du lägga till en kommentar för varje vald tjänst, om du har specifika önskemål eller information att dela med dig av.</li>
                     </ul>
                 </div>
 
-                <form action="{{ route('booking.step1') }}" method="POST">
+                <form action="{{ route('booking.step1') }}" method="POST" id="bookingForm">
                     @csrf
                     <div class="row">
                         @foreach($categories as $category)
@@ -135,65 +138,80 @@
                                 <p>{{ $category->description }}</p>
 
                                 <div class="servicesContainer">
-                                    @foreach($category->services as $service)
-                                        <div class="service-wrapper">
-                                            <label class="form-check form-check-select" for="service{{ $service->id }}">
-                                                <input type="checkbox" class="form-check-input service-checkbox"
-                                                       value="{{ $service->id }}"
-                                                       name="services[]" id="service{{ $service->id }}"
-                                                       data-price="{{ $service->price }}"
-                                                       data-material-price="{{ $service->material_price ?? 0 }}"
-                                                       data-customer-material="{{ $service->customer_materials }}"
-                                                       data-type="{{ $service->type }}">
-                                                <span class="form-check-label">
-                                                    <span class="fw-medium">{{ $service->name }}</span>
-                                                    <span
-                                                        class="d-block fs-6 text-muted">{{ $service->description }}</span>
-                                                    @if($service->is_rut)
-                                                        <span class="d-block fs-6 text-success">RUT-berättigad</span>
-                                                    @endif
-                                                    @if($service->is_rot)
-                                                        <span class="d-block fs-6 text-warning">ROT-berättigad</span>
-                                                    @endif
-                                                </span>
-                                                <span class="form-check-stretched-bg"></span>
+                                    @foreach($category->services->where('active', 1) as $service)
+                                        <div class="service-wrapper form-check form-check-select">
+                                            <input type="checkbox" class="form-check-input service-checkbox"
+                                                   value="{{ $service->id }}"
+                                                   name="services[]" id="service{{ $service->id }}"
+                                                   data-price="{{ $service->price }}"
+                                                   data-material-price="{{ $service->material_price ?? 0 }}"
+                                                   data-customer-material="{{ $service->customer_materials }}"
+                                                   data-type="{{ $service->type }}"
+                                                   data-estimated-minutes="{{ $service->estimated_minutes }}">
 
-                                                <div class="service-options" style="display:none;">
-                                                    @if($service->service_options)
-                                                        @foreach($service->service_options as $option)
-                                                            <div class="form-check" style="z-index: 2;">
-                                                                <input type="checkbox" id="option{{ $option->id }}"
-                                                                       class="form-check-input" name="options[]"
-                                                                       data-price="{{ $option->price ?? 0 }}"
-                                                                       value="{{ $option->id }}">
-                                                                <label class="form-check-label"
-                                                                       for="option{{ $option->id }}">{{ $option->name }}</label>
-                                                            </div>
-                                                        @endforeach
-                                                    @endif
 
-                                                    @if($service->type === 'quantity')
-                                                        <div class="form-group col-3 mt-2">
-                                                            <input type="number"
-                                                                   name="service_quantity[{{ $service->id }}]"
-                                                                   value="1"
-                                                                   placeholder="Antal"
-                                                                   class="form-control form-control-sm">
+                                            <span class="form-check-label">
+                                                <span class="fw-medium service-name" data-service-id="{{ $service->id }}">{{ $service->name }}</span>
+                                                <span
+                                                    class="d-block fs-6 text-muted">{{ $service->description }}</span>
+                                                {{--@if($service->is_rut)
+                                                    <span class="d-block fs-6 text-success">RUT-berättigad</span>
+                                                @endif
+                                                @if($service->is_rot)
+                                                    <span class="d-block fs-6 text-warning">ROT-berättigad</span>
+                                                @endif --}}
+                                            </span>
+                                            <span class="form-check-stretched-bg"></span>
+
+                                            <div class="service-options" style="display:none;">
+                                                @if($service->service_options)
+                                                    @foreach($service->service_options as $option)
+                                                        <div class="form-check" style="z-index: 2;">
+                                                            <input type="checkbox" id="option{{ $option->id }}"
+                                                                   class="form-check-input" name="options[]"
+                                                                   data-price="{{ $option->price ?? 0 }}"
+                                                                   data-estimated-minutes="{{ $option->estimated_minutes }}"
+                                                                   data-has-quantity="{{ $option->has_quantity }}"
+                                                                   value="{{ $option->id }}">
+                                                            <label class="form-check-label"
+                                                                   for="option{{ $option->id }}">{{ $option->name }}</label>
+
+                                                            @if($option->has_quantity)
+                                                                <div class="option-quantity-wrapper"
+                                                                     style="display: none;">
+                                                                    <input type="number"
+                                                                           name="option_quantity[{{ $option->id }}]"
+                                                                           value="1"
+                                                                           placeholder="Antal"
+                                                                           class="form-control form-control-sm mt-2"
+                                                                           style="width: 100px;">
+                                                                </div>
+                                                            @endif
                                                         </div>
-                                                    @endif
+                                                    @endforeach
+                                                @endif
 
-                                                    @if($service->customer_materials === 'yes')
-                                                        <div class="has-material-check">
-                                                            <input type="checkbox" class="form-check-input has-material"
-                                                                   id="hasMaterial{{ $service->id }}"
-                                                                   name="has_material[{{ $service->id }}]"
-                                                                   value="{{ $service->id }}">
-                                                            <label
-                                                                for="hasMaterial{{ $service->id }}">Jag har eget material</label>
-                                                        </div>
-                                                    @endif
-                                                </div>
-                                            </label>
+                                                @if($service->type === 'quantity')
+                                                    <div class="form-group col-3 mt-2">
+                                                        <input type="number"
+                                                               name="service_quantity[{{ $service->id }}]"
+                                                               value="1"
+                                                               placeholder="Antal"
+                                                               class="form-control form-control-sm service-quantity">
+                                                    </div>
+                                                @endif
+
+                                                @if($service->customer_materials === 'yes')
+                                                    <div class="has-material-check">
+                                                        <input type="checkbox" class="form-check-input has-material"
+                                                               id="hasMaterial{{ $service->id }}"
+                                                               name="has_material[{{ $service->id }}]"
+                                                               value="{{ $service->id }}">
+                                                        <label
+                                                            for="hasMaterial{{ $service->id }}">Jag har eget material</label>
+                                                    </div>
+                                                @endif
+                                            </div>
                                         </div>
                                     @endforeach
                                 </div>
@@ -201,20 +219,29 @@
                         @endforeach
                     </div>
 
-                    <div class="d-flex justify-content-end mt-3">
-                        <button type="submit" class="btn btn-primary">
-                            Gå vidare
-                            <i class="fa fa-angle-right ms-2"></i>
-                        </button>
-                    </div>
                 </form>
 
             </div>
         </div>
 
-        <div id="stickyPopup" class="sticky-popup">
-            <span id="rutText"></span> <span id="totalPrice" data-current-price="0">0.00</span> kr
+        <!--<div id="stickyPopup" class="sticky-popup bg-dark text-white rounded align-items-center justify-content-center">
+            <span id="rutText" class="me-2"></span>
+            <span id="totalPrice" data-current-price="0" class="me-2">0.00</span> kr
+            <button type="submit" form="bookingForm" class="btn btn-primary btn-sm ms-3 go-forward-btn">
+                <span>Gå vidare</span>
+                <i class="fa fa-angle-right ms-lg-2"></i>
+            </button>
+        </div>-->
+
+        <div id="stickyPopup" class="sticky-popup bg-dark text-white rounded align-items-center justify-content-center">
+            <span id="rutText" class="me-2"></span>
+            <span id="totalTime" data-current-time="0" class="me-2">0</span>
+            <button type="submit" form="bookingForm" class="btn btn-primary btn-sm ms-3 go-forward-btn">
+                <span>Gå vidare</span>
+                <i class="fa fa-angle-right ms-lg-2"></i>
+            </button>
         </div>
+
 
         <!-- Post a Comment -->
         <div class="container pb-10">
@@ -274,4 +301,13 @@
 
 @push('js')
     <script src="/assets/js/home.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.service-name').on('click', function(event) {
+                const serviceId = $(this).data('service-id');
+                const checkbox = $(`#service${serviceId}`);
+                checkbox.prop('checked', !checkbox.prop('checked')).trigger('change'); // Växlar checkboxens tillstånd och triggar ett 'change'-event
+            });
+        });
+    </script>
 @endpush

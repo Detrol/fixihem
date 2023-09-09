@@ -28,9 +28,13 @@
                             <div class="card card-shadow h-100">
                                 <div class="card-body">
                                     <h4 class="mb-0">{{ $service['name'] }}</h4>
-                                    <h6>{{ $service['quantity'] ? $service['quantity'] . ' st - ' : '' }}<span
-                                            class="text-primary">{{ $service['price'] }} kr{{ $service['quantity'] ? '/st' : '' }}</span>
-                                    </h6>
+                                    @if($service['price'] != 0)
+                                        <h6>
+                                            {{ $service['quantity'] ? $service['quantity'] . ' st - ' : '' }}
+                                            <span
+                                                class="text-primary">{{ $service['price'] }} kr{{ $service['quantity'] ? '/st' : '' }}</span>
+                                        </h6>
+                                    @endif
                                     @if ($service['material_price'])
                                         <span class="fw-medium">Materialkostnad:</span>
                                         @if ($service['has_material'])
@@ -47,28 +51,31 @@
 
                                     @if (count($service['options']) > 0)
                                         <p>
-                                            <span
-                                                class="fw-medium">Typ{{ count($service['options']) > 1 ? 'er' : '' }}:</span>
                                             @foreach($service['options'] as $option)
                                                 {{ $option->name }}
 
-                                                @if($service['has_material'])
-                                                    <s>{{ $option->price ? '(' . $option->price . ' kr/st)' : '' }}</s>
-                                                @else
-                                                    {{ $option->price ? '(' . $option->price . ' kr/st)' : '' }}
+                                                @if($option->price != 0.0)
+                                                    @if($service['has_material'])
+                                                        <s>{{ $option->price ? '(' . $option->price . ' kr/st)' : '' }}</s>
+                                                    @else
+                                                        {{ $option->price ? '(' . $option->price . ' kr/st)' : '' }}
+                                                    @endif
                                                 @endif
 
+                                                @if ($option->quantity > 1)
+                                                    - {{ $option->quantity ?? 1 }} st
+                                                @endif
                                                 {{ $loop->last ? '' : ', ' }}
                                             @endforeach
                                         </p>
                                     @endif
 
-                                    @if($service['is_rut'])
+                                    {{--@if($service['is_rut'])
                                         <span class="d-block fs-6 text-success">RUT-berättigad</span>
                                     @endif
                                     @if($service['is_rot'])
                                         <span class="d-block fs-6 text-warning">ROT-berättigad</span>
-                                    @endif
+                                    @endif--}}
 
                                     <div class="mt-3">
                                         <label for="comment_{{ $serviceId }}">Kommentar:</label>

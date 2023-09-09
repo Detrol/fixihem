@@ -3,9 +3,9 @@
 @section('content')
 
     <main id="content" role="main">
-        {{--@foreach (session()->all() as $key => $value)
+       @foreach (session()->all() as $key => $value)
             <p><strong>{{ $key }}:</strong> {{ is_array($value) ? json_encode($value) : $value }}</p>
-        @endforeach--}}
+        @endforeach
         <!-- Card Grid -->
         <div class="container content-space-t-3">
             <div class="row justify-content-lg-between sidebar-parent">
@@ -70,7 +70,7 @@
                                     </div>
 
                                     <div class="form-floating col-12 col-md-8 mb-3 mt-3">
-                                        <select name="time1" class="form-select" id="time" aria-label="Önskad tid"
+                                        <select name="time" class="form-select" id="time" aria-label="Önskad tid"
                                                 required>
                                             <option selected>Välj datum först</option>
                                         </select>
@@ -153,10 +153,6 @@
                                         <i class="fa fa-user mr-2"></i>
                                         Avstånd till din adress: <strong id="calculated-distance"></strong> km
                                     </li>
-                                    <li class="list-group-item">
-                                        <i class="fa fa-car mr-2"></i>
-                                        Reseersättning till dig: <strong id="travel-price"></strong> kr
-                                    </li>
                                 </ul>
                             </div>
 
@@ -166,31 +162,47 @@
                                 <ul class="list-group">
                                     <li class="list-group-item">
                                         <i class="fas fa-recycle mr-2"></i>
-                                        Avstånd till återvinningscentral: <strong
+                                        Avstånd till återvinning: <strong
                                             class="recycling-distance"></strong> km
                                     </li>
                                     <li class="list-group-item">
-                                        <i class="fas fa-coins mr-2"></i>
-                                        Reseersättning till återvinningscentral: <strong
+                                        <i class="fas fa-car mr-2"></i>
+                                        Reseersättning till återvinning: <strong
                                             class="recycling-price"></strong> kr
                                     </li>
+                                    <li class="list-group-item">
+                                        <i class="fa fa-clock mr-2"></i>
+                                        Researbetskostnad: <strong id="time-price"></strong> kr
+                                    </li>
                                 </ul>
+                                <p class="mb-0">
+                                    Kom ihåg att ovan priser gäller för en tur.
+                                </p>
                             </div>
 
                             <!-- Prisinformation kolumn -->
-                            <div id="price-container" class="col-md-6" data-total-price="{{ $totalPrice }}">
+                            <div id="price-container" class="col-md-6 mb-4" data-total-price="{{ $totalPrice }}">
                                 <h4 class="mb-3">Prisinformation</h4>
-                                <ul class="list-group mb-4">
+                                <ul class="list-group">
+                                    <li class="list-group-item">
+                                        <i class="fa fa-car mr-2"></i>
+                                        Reseersättning till dig: <strong id="travel-price"></strong> kr
+                                    </li>
                                     <li class="list-group-item">
                                         <i class="fa fa-tag mr-2"></i>
-                                        Preliminärt pris: <strong id="preliminary-price">{{ $totalPrice }} kr</strong>
+                                        Uppskattat pris: <strong id="preliminary-price">{{ $totalPrice }} kr</strong>
                                     </li>
                                 </ul>
                             </div>
                         </div>
 
-                        <div class="alert alert-warning small p-2">
-                            Observera att reseersättning inte kan faktureras tillsammans med RUT eller ROT. Därför kommer du att få en separat faktura för detta.
+                        <div class="alert alert-warning small p-3">
+                            <strong>Observera:</strong>
+                            <ul class="mt-2 mb-0 pl-1 text-dark">
+                                <li>Priserna ovan är endast lösa uppskattningar och kan variera beroende på olika faktorer. Det slutgiltiga priset kan påverkas av olika omständigheter som uppstår under arbetets gång.</li>
+                                <li>Min taxa är 300 kr/timme (inklusive RUT), räknat från det att jag anländer till platsen tills arbetet är avslutat.</li>
+                                <li>Reseersättning och hyrning av släp kan inte faktureras tillsammans med RUT. Därför kommer du att få en separat faktura för dessa.</li>
+                            </ul>
                         </div>
 
                     </div>
@@ -220,9 +232,12 @@
                             <div class="card">
                                 <div class="card-body p-3">
                                     <h5 class="mb-0">{{ $service['name'] }}</h5>
+                                    @if($service['price'] != 0.0)
                                     <h6>{{ $service['quantity'] ? $service['quantity'] . ' st - ' : '' }}<span
                                             class="text-primary">{{ $service['price'] }} kr{{ $service['quantity'] ? '/st' : '' }}</span>
                                     </h6>
+                                    @endif
+
                                     @if ($service['material_price'])
                                         <span class="fw-medium">Materialkostnad:</span>
                                         @if ($service['has_material'])
@@ -232,6 +247,7 @@
                                         @endif
                                     @endif
 
+                                    {{--
                                     @if($service['is_rut'])
                                         <span class="d-block fs-6 text-success">RUT-berättigad</span>
                                     @endif
@@ -239,20 +255,24 @@
                                     @if($service['is_rot'])
                                         <span class="d-block fs-6 text-warning">ROT-berättigad</span>
                                     @endif
+                                    --}}
 
                                     @if (count($service['options']) > 0)
                                         <p>
-                                            <span
-                                                class="fw-medium">Typ{{ count($service['options']) > 1 ? 'er' : '' }}:</span>
                                             @foreach($service['options'] as $option)
                                                 {{ $option->name }}
 
-                                                @if($service['has_material'])
-                                                    <s>{{ $option->price ? '(' . $option->price . ' kr/st)' : '' }}</s>
-                                                @else
-                                                    {{ $option->price ? '(' . $option->price . ' kr/st)' : '' }}
+                                                @if($option->price != 0)
+                                                    @if($service['has_material'])
+                                                        <s>{{ $option->price ? '(' . $option->price . ' kr/st)' : '' }}</s>
+                                                    @else
+                                                        {{ $option->price ? '(' . $option->price . ' kr/st)' : '' }}
+                                                    @endif
                                                 @endif
 
+                                                @if ($option->quantity > 1)
+                                                    - {{ $option->quantity ?? 1 }} st
+                                                @endif
                                                 {{ $loop->last ? '' : ', ' }}
                                             @endforeach
                                         </p>

@@ -24,7 +24,7 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $categories = Category::with('services', 'services.service_options')->get();
+        $categories = Category::with('services', 'services.service_options')->where('active', 1)->get();
 
         return view('home', compact('categories'));
     }
