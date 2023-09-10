@@ -612,7 +612,18 @@ class BookingController extends Controller
 
         foreach ($missions_today as $mission) {
 
-            $mission_travel_time = $mission->to_customer_time;
+            if (isset($mission->to_customer_time)) {
+                $mission_travel_time = $mission->to_customer_time;
+            } else {
+                if ($mission->user_id) {
+                    $mission_travel_time = DB::connection('second_db')->table('customer_details_users')->where('user_id', $mission->user_id)->first()->travel_time;
+                } elseif ($mission->unique_id) {
+                    $mission_travel_time = DB::connection('second_db')->table('customer_visits')->where('unique_id', $mission->unique_id)->first()->travel_time;
+                } else {
+                    $mission_travel_time = DB::connection('second_db')->table('customer_details')->where('order_id', $mission->order_id)->first()->travel_time;
+                }
+            }
+
             $mission_travel_time = roundUpToAny($mission_travel_time);
 
             $sub_minutes = $mission_travel_time + 15;
