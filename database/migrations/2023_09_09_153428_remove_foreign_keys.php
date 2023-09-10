@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('bookings', function (Blueprint $table) {
+        /*Schema::table('bookings', function (Blueprint $table) {
             $table->dropForeign('bookings_customer_id_foreign');
         });
 
@@ -20,7 +20,7 @@ return new class extends Migration
             $table->dropForeign('booking_services_service_id_foreign');
         });
 
-        /*Schema::table('customers', function (Blueprint $table) {
+        Schema::table('customers', function (Blueprint $table) {
             $table->dropForeign('customers_order_id_foreign');
         });*/
 
