@@ -628,7 +628,7 @@ class BookingController extends Controller
 
             $sub_minutes = $mission_travel_time + 15;
 
-            $date = $mission->date_time ?: $mission->date;
+            $date = $mission->date_time ?? $mission->date;
 
             $mission_start = Carbon::parse($date)->subMinutes($sub_minutes)->tz('Europe/Stockholm');
             if ($mission_start->lt($start)) {
