@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\Generic;
 use App\Models\Booking;
 use App\Models\BookingService;
 use App\Models\Customers;
@@ -15,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class BookingController extends Controller
@@ -47,7 +49,7 @@ class BookingController extends Controller
             'status' => 1,
             'expected_time' => session('expectedTime'),
             'price' => $price,
-            'total_price' => $totalPrice
+            'total_price' => $totalPrice,
         ], $travelData);
 
         $extraTimeForDrive = 60;
@@ -98,7 +100,30 @@ class BookingController extends Controller
                 BookingService::insert($bookingServices);
             });
 
-            session()->flush();
+            $info['sms'] = null;
+            $info['sms'] .= "Din order har nu mottagits, du kommer få en bekräftelse så fort den har setts över.";
+
+            $sms = array(
+                'from' => 'Fixihem',   /* Can be up to 11 alphanumeric characters */
+                'to' => check_number(request()->phone),  /* The mobile number you want to send to */
+                'message' => $info['sms'],
+            );
+            //echo sendSMS($sms) . "\n";
+
+            $body = 'En bokning har kommit in.';
+
+            $mailData = [
+                'subject' => 'Ny bokning',
+                'message' => $body,
+            ];
+
+            try {
+                //Mail::to('info@fixihem.se')->send(new Generic($mailData));
+            } catch (Exception $e) {
+                // Handle the case where the email could not be sent
+            }
+
+            session()->keep('login_web_' . sha1(\App\Http\Controllers\Controller::class));
 
             return redirect()->route('home')->with('status', 'Bokning skapad!');
         } catch (\Exception $e) {
@@ -440,10 +465,10 @@ class BookingController extends Controller
         return response()->json($recyclingInfo);
     }
 
-    public function checkDate(Request $request)
+    /*public function checkDate(Request $request)
     {
         $missionsToday = $this->getMissionsForDate($request->date, $request->order_id);
-        $currentMissionDuration = $this->getCurrentMissionDuration();
+        $currentMissionDuration = $this->getCurrentMissionDuration($request->order_id);
 
         $startOfDay = Carbon::parse($request->date . ' ' . '09:00')->tz('Europe/Stockholm');
         $endOfDay = Carbon::parse($request->date . ' ' . '16:00')->tz('Europe/Stockholm')->subMinutes($currentMissionDuration);
@@ -451,7 +476,13 @@ class BookingController extends Controller
         $busyTimes = $this->getBusyTimes($missionsToday, $startOfDay, $endOfDay, $currentMissionDuration);
         $freeTimes = $this->getFreeTimes($startOfDay, $endOfDay, $busyTimes);
 
-        return response()->json($freeTimes);
+        // Omvandla Carbon objekt till strängar i H:i format
+        $formattedFreeTimes = [];
+        foreach ($freeTimes as $time) {
+            $formattedFreeTimes[] = Carbon::parse($time)->format('H:i');
+        }
+
+        return $formattedFreeTimes;
     }
 
     private function getMissionsForDate($date, $excludeOrderId)
@@ -461,16 +492,24 @@ class BookingController extends Controller
             ->get();
 
         return $missions->filter(function ($mission) use ($date) {
-            return Carbon::parse($mission->date)->tz('Europe/Stockholm')->isSameDay($date);
+            return Carbon::parse($mission->date_time)->tz('Europe/Stockholm')->isSameDay($date);
         });
     }
 
-    private function getCurrentMissionDuration()
+    private function getCurrentMissionDuration($order_id)
     {
-        $travelTime = session('travel_duration');
-        $extraMinutes = ($travelTime * 2) + 15;
+        if ($order_id){
+            $mission = Booking::findOrFail($order_id);
 
-        $expectedEndTime = Carbon::now()->addMinutes(max(session('expectedTime'), 60))->addMinutes($extraMinutes);
+            $travelTime = $mission->to_customer_time;
+            $extraMinutes = ($travelTime * 2) + 15;
+            $expectedEndTime = Carbon::now()->addMinutes(max($mission->expected_time, 60))->addMinutes($extraMinutes);
+        } else {
+            $travelTime = session('travel_duration');
+            $extraMinutes = ($travelTime * 2) + 15;
+            $expectedEndTime = Carbon::now()->addMinutes(max(session('expectedTime'), 60))->addMinutes($extraMinutes);
+        }
+
         return $expectedEndTime->diffInMinutes(Carbon::now());
     }
 
@@ -480,11 +519,11 @@ class BookingController extends Controller
 
         foreach ($missionsToday as $mission) {
             $missionStart = $this->getMissionStart($mission, $startOfDay);
-            $missionEnd = $this->getMissionEnd($mission, $currentMissionDuration);
 
-            $busyPeriod = new CarbonPeriod($missionStart, $missionEnd);
+            // Denna period representerar de upptagna tiderna för detta uppdrag, baserat på dess varaktighet.
+            $busyPeriod = new CarbonPeriod($missionStart, $missionStart->copy()->addMinutes($currentMissionDuration), CarbonInterval::minutes(15));
 
-            foreach ($busyPeriod->dateInterval as $busyTime) {
+            foreach ($busyPeriod as $busyTime) {
                 $busyTimes->push($busyTime);
             }
         }
@@ -503,20 +542,151 @@ class BookingController extends Controller
 
     private function getMissionStart($mission, $startOfDay)
     {
-        $travelTime = Customers::where('order_id', $mission->order_id)->first()->travel_time;
-        $missionStart = Carbon::parse($mission->date)->subMinutes($travelTime + 15)->tz('Europe/Stockholm');
+        $travelTime = Booking::where('order_id', $mission->order_id)->first()->to_customer_time;
+        $missionStart = Carbon::parse($mission->date_time)->subMinutes($travelTime + 15)->tz('Europe/Stockholm');
 
         return $missionStart->lt($startOfDay) ? $startOfDay : $missionStart;
     }
 
     private function getMissionEnd($mission, $currentMissionDuration)
     {
-        $travelTime = Customers::where('order_id', $mission->order_id)->first()->travel_time;
+        $travelTime = Booking::where('order_id', $mission->order_id)->first()->to_customer_time;
 
-        return Carbon::parse($mission->date)
+        return Carbon::parse($mission->date_time)
             ->addSeconds(max($mission->expected_time, 3600))
             ->addMinutes($travelTime + 15 + $currentMissionDuration)
             ->tz('Europe/Stockholm');
+    }*/
+
+    function checkDate(Request $request)
+    {
+        $missions_today = collect();
+        $busy_between = collect();
+        $busy_times = collect();
+        $times = array();
+
+        $missions = Booking::whereIn('status', ['1', '2'])->where('id', '!=', $request->order_id)->get();
+
+        $current_mission = Booking::where('id', $request->order_id)->first();
+        if (!isset($current_mission)) {
+            $current_travel_time = session('travel_duration');
+        } else {
+            $current_travel_time = $current_mission->to_customer_time;
+        }
+
+        foreach ($missions as $mission) {
+            if (Carbon::parse($mission->date_time)->tz('Europe/Stockholm')->format('Y-m-d') == $request->date) {
+                $missions_today->add($mission);
+            }
+        }
+
+        try {
+            // Hämta data från andra databasen
+            $missionsFromSecondDb = DB::connection('second_db')->table('customer_bookings')->whereIn('status', ['1', '2'])->get();
+
+            foreach ($missionsFromSecondDb as $mission) {
+                if (Carbon::parse($mission->date)->tz('Europe/Stockholm')->format('Y-m-d') == $request->date) {
+                    $missions_today->add($mission);
+                }
+            }
+        } catch (\Exception $e) {
+            // Här hanteras eventuella fel som uppstår när du försöker ansluta till den andra databasen eller hämta data
+            // Du kan logga felet eller göra något annat beroende på ditt behov
+            \Log::error("Error connecting to second database: " . $e->getMessage());
+        }
+
+        $start = Carbon::parse($request->date . ' 09:00')->tz('Europe/Stockholm');
+        $end = Carbon::parse($request->date . ' 16:00')->tz('Europe/Stockholm');
+
+        $add_minutes = ($current_travel_time * 2) + 15;
+
+        if (!isset($current_mission->expected_time)) {
+            $current_mission_end_from_now = Carbon::now()->addSeconds(max(session('expected_time'), 3600))->addMinutes($add_minutes)->tz('Europe/Stockholm');
+        } else {
+            $current_mission_end_from_now = Carbon::now()->addSeconds(max($current_mission->expected_time, 3600))->addMinutes($add_minutes)->tz('Europe/Stockholm');
+        }
+        $current_mission_length = roundUpToAny($current_mission_end_from_now->diffInMinutes(Carbon::now()));
+
+        // Vi vill att arbetet slutar innan dagen slutar
+        $end = $end->subMinutes($current_mission_length);
+
+        foreach ($missions_today as $mission) {
+
+            $mission_travel_time = $mission->to_customer_time;
+            $mission_travel_time = roundUpToAny($mission_travel_time);
+
+            $sub_minutes = $mission_travel_time + 15;
+
+            $date = $mission->date_time ?: $mission->date;
+
+            $mission_start = Carbon::parse($date)->subMinutes($sub_minutes)->tz('Europe/Stockholm');
+            if ($mission_start->lt($start)) {
+                $mission_start = $start;
+            }
+
+            $add_minutes = $mission_travel_time + 15;
+
+            $mission_end = Carbon::parse($date)->addSeconds(max($mission->expected_time, 3600))->addMinutes($add_minutes)->tz('Europe/Stockholm');
+            $busy_between->add(['start' => $mission_start, 'end' => $mission_end]);
+        }
+
+        // RESERVED TIMES
+        /*$reservedTimes = ReservedTimes::where('date', Carbon::parse($request->date)->format('Y-m-d'))->first();
+        if ($reservedTimes?->from && $reservedTimes?->to) {
+            $busy_between->add(['start' => Carbon::parse($request->date . ' ' . $reservedTimes->from)->tz('Europe/Stockholm'), 'end' => Carbon::parse($request->date . ' ' . $reservedTimes->to)->tz('Europe/Stockholm')]);
+        }
+
+        // SPECIAL TIMES
+        $specialTimes = SpecialTimes::where('date', Carbon::parse($request->date)->format('Y-m-d'))->first();
+        if ($specialTimes?->from && $specialTimes?->to) {
+            $busy_between->add(['start' => Carbon::parse($request->date . ' ' . $specialTimes->from)->tz('Europe/Stockholm'), 'end' => Carbon::parse($request->date . ' ' . $specialTimes->to)->tz('Europe/Stockholm')]);
+        }*/
+
+        $busy_times = collect();
+
+        $intervals = CarbonInterval::minutes('15')->toPeriod($start, $end);
+        foreach ($intervals as $time) {
+            $this_time = Carbon::parse($time)->tz('Europe/Stockholm');
+
+            // 10 minutes extra for preparations
+            $add_minutes = $current_mission_length + 10;
+
+            $current_mission_end_from_time = Carbon::parse(roundToNearestMinuteInterval($this_time->addMinutes($add_minutes)));
+
+            if ($busy_between->isNotEmpty()) {
+                foreach ($busy_between as $busy) {
+                    if ($time->between($busy['start'], $busy['end'])) {
+                        $busy_times->add($time->format('H:i'));
+                    }
+
+                    $exitingAppointment = CarbonPeriod::create($busy['start'], $busy['end']);
+                    $appointmentTentative = CarbonPeriod::create($time, $current_mission_end_from_time);
+
+                    if ($exitingAppointment->overlaps($appointmentTentative)) {
+                        $busy_times->add($time->format('H:i'));
+                    }
+                }
+            }
+        }
+
+        $busy_times = $busy_times->unique()->sort();
+
+        foreach ($intervals as $time) {
+            if (!$busy_times->contains($time->format('H:i'))) {
+                //$free_times->add($time->format('H:i'));
+                $times[] = $time->format('H:i');
+            }
+        }
+
+        echo json_encode(array_unique($times));
     }
+
+
+    /*
+     *
+     * HANTERA BOKNINGAR
+     *
+     */
+
 
 }

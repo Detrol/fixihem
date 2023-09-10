@@ -50,7 +50,10 @@ Route::prefix('admin')->middleware('is.admin', 'AdminMiddleware')->group(functio
     Route::get('bookings/{status}', [AdminController::class, 'bookings'])->name('bookings');
 
     Route::get('order_details', [AdminController::class, 'order_details'])->name('order_details');
-    Route::get('/admin/order/{order}/invoice-text', [AdminController::class, 'generateInvoiceText'])->name('admin.order.invoice-text');
+    Route::get('order/{order}/invoice-text', [AdminController::class, 'generateInvoiceText'])->name('admin.order.invoice-text');
+
+    Route::get('order_edit/{order_id}', [AdminController::class, 'order_edit'])->name('order_edit');
+    Route::post('order_edit_submit/{order_id}', [AdminController::class, 'order_edit_submit'])->name('order_edit_submit');
 
     Route::get('order_accept/{order_id}', [AdminController::class, 'order_accept'])->name('order_accept');
     Route::get('order_abort/{order_id}', [AdminController::class, 'order_abort'])->name('order_abort');

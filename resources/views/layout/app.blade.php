@@ -30,7 +30,7 @@
 
 <body>
 <!-- ========== HEADER ========== -->
-<header id="header" class="navbar navbar-expand-lg navbar-shadow navbar-sticky-top navbar-show-hide navbar-light"
+<header id="header" class="navbar navbar-expand-lg navbar-shadow navbar-sticky-top navbar-show-hide navbar-light bg-white" style="z-index: 999999"
         data-hs-header-options='{
           "fixMoment": 500,
           "fixEffect": "slide"
@@ -107,6 +107,30 @@
 </footer>
 <!-- ========== END FOOTER ========== -->
 
+@if (session()->has('status'))
+    <div id="toast" class="toast shadow" role="alert" aria-live="assertive" aria-atomic="true" data-delay="5000" style="z-index: 9999999">
+        <div class="toast-header bg-gradient-light text-gray-800">
+            <span class="me-auto"><i class="fas fa-info-circle"></i> Meddelande</span>
+            <i type="button" class="fa-solid fa-times" data-bs-dismiss="toast" aria-label="Close"></i>
+        </div>
+        <div class="toast-body bg-white p-3 text-muted">
+            {{ session('status') }}
+        </div>
+    </div>
+@endif
+
+<div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+        <img src="..." class="rounded me-2" alt="...">
+        <strong class="me-auto">Bootstrap</strong>
+        <small>11 mins ago</small>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+        Hello, world! This is a toast message.
+    </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"
         integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -123,20 +147,11 @@
 
 <!-- JS Plugins Init. -->
 <script>
-    (function () {
-        // INITIALIZATION OF MEGA MENU
-        // =======================================================
-        const megaMenu = new HSMegaMenu('.js-mega-menu', {
-            desktop: {
-                position: 'left'
-            }
-        })
-
-
-        // INITIALIZATION OF HEADER
-        // =======================================================
-        new HSHeader('#header').init()
-    })()
+    window.onload = (event) => {
+        var toastLiveExample = document.getElementById('toast')
+        var toast = new bootstrap.Toast(toastLiveExample)
+        toast.show()
+    }
 </script>
 
 @stack('js')

@@ -32,8 +32,6 @@
 
     <link rel="stylesheet" href="{{ asset('assets/admin/css/core.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/admin/css/vendor_bundle.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/admin/css/vegas.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/admin/css/datepicker.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/admin/css/custom.css') }}">
     <link href="{{ url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap') }}"
           rel="stylesheet">
@@ -43,12 +41,14 @@
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jodit/3.6.1/jodit.min.css"/>
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css">
 
-    <link rel="stylesheet" href="{{ asset('assets/admin/css/fontawesome.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/admin/css/brands.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/admin/css/solid.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/admin/css/light.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/admin/css/thin.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/admin/css/regular.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/fontawesome.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/brands.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/solid.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/light.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/thin.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/regular.css') }}">
+
+    <link rel="stylesheet" href="{{ asset('assets/css/datepicker.css') }}">
 
 </head>
 
@@ -253,10 +253,8 @@
     @endif
 </div>
 
-<script src="{{ asset('assets/admin//js/core.min.js') }}"></script>
-<script src="{{ asset('assets/admin//js/vendor_bundle.min.js') }}"></script>
-<script src="{{ asset('assets/js/vegas.min.js') }}"></script>
-<script src="{{ asset('assets/js/bootstrap-input-spinner.js') }}"></script>
+<script src="{{ asset('assets/admin/js/core.min.js') }}"></script>
+<script src="{{ asset('assets/admin/js/vendor_bundle.min.js') }}"></script>
 <script src="{{ asset('assets/js/custom.js') }}"></script>
 <script src="{{ url('https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.25.1/trumbowyg.min.js') }}"></script>
 <script src="{{ url('https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.25.1/langs/sv.min.js') }}"></script>

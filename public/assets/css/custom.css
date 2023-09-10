@@ -1,3 +1,10 @@
+.btn-xs, .btn-group-xs > .btn {
+    padding: 0.53rem 0.5rem;
+    font-size: 0.8rem;
+    line-height: 0.75;
+    border-radius: 0.2rem;
+}
+
 .service-options {
     position: relative;
     z-index: 1000;
@@ -14,6 +21,15 @@
 
 #sidebar {
     transition: margin-top 0.1s ease;
+}
+
+.toast {
+    top: 20px;
+    left: 50%;
+    position: fixed;
+    transform: translate(-50%, 0px);
+    z-index: 99999;
+    width: 300px;
 }
 
 .sticky-popup,

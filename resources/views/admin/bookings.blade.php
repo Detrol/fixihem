@@ -27,10 +27,10 @@
                                 <strong>Datum:</strong> {{ $order['date'] }}
                             </p>
                             <p class="m-0">
-                                <strong>Pris:</strong> {{ number_format($order['price']) }} kr
+                                <strong>Uppskattat pris:</strong> {{ number_format($order['price']) }} kr
                             </p>
                             <p class="m-0">
-                                <strong>Netto:</strong> {{ number_format($order['paid']) }} kr
+                                <strong>Uppskattat netto:</strong> {{ number_format($order['paid']) }} kr
                             </p>
                             @if (!empty($order['discount_code']))
                                 <p class="m-0">
@@ -46,9 +46,21 @@
                             <p>
                                 <strong>Restid:</strong> {{ $order['travel_time'] }}
                             </p>
+
+                            @if ($order['status'] == 3)
+                                <p class="m-0">
+                                    <strong>Slutpris:</strong> {{ number_format($order['customer_price']) }} kr
+                                </p>
+                                <p>
+                                    <strong>Netto:</strong> {{ number_format($order['net_earnings']) }} kr
+                                </p>
+                            @endif
+
                             <p class="m-0">
                                 <strong>Förväntad tid:</strong> {{ $order['expected_time'] }}
                             </p>
+
+
 
                             @if ($order['start'] !== $order['stop'] && $order['stop'] !== null)
                                 <p class="m-0">
@@ -57,10 +69,10 @@
                                 </p>
 
                                 <p class="m-0">
-                                    {{ number_format(((get_price($order['order_id'])->total - get_price($order['order_id'])->distance) * 60) / \Carbon\Carbon::parse($order['start'])->diffInMinutes($order['stop'])) }}
+                                    {{ number_format($order['hourlyRate']) }}
                                     kr/h
                                     (netto
-                                    {{ number_format(((get_price($order['order_id'])->total * 0.8 - get_price($order['order_id'])->distance) * 60) / \Carbon\Carbon::parse($order['start'])->diffInMinutes($order['stop'])) }}
+                                    {{ number_format($order['hourlyRateNet']) }}
                                     kr/h)
                                 </p>
                             @endif
@@ -72,7 +84,7 @@
                                     <a href="{{ route('order_abort', ['order_id' => $order['order_id']]) }}"
                                        class="btn btn-link text-danger d-inline">Neka</a>
                                 </div>
-                                <a href=""
+                                <a href="{{ route('order_edit', ['order_id' => $order['order_id']]) }}"
                                    class="btn btn-link d-inline">Redigera</a>
                             @else
                                 <div class="d-flex">
@@ -242,7 +254,7 @@
                                         </div>
                                     </div>
                                     <div class="d-inline">
-                                        <a href=""
+                                        <a href="{{ route('order_edit', ['order_id' => $order['order_id']]) }}"
                                            class="btn btn-link">Redigera</a>
                                     </div>
                                 </div>

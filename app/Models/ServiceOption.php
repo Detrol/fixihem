@@ -10,4 +10,9 @@ class ServiceOption extends Model
     use HasFactory;
 
     protected $fillable = ['estimated_minutes'];
+
+    public function service()
+    {
+        return $this->belongsTo(Service::class);
+    }
 }

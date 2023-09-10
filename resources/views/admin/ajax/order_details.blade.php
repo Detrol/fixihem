@@ -70,12 +70,12 @@
                     {{ \Carbon\Carbon::parse($order->date_time)->format('d/m - H:i') }}<br/>
                     <strong>Pris:</strong> {{ number_format($order->total_price) }} kr
                     @if ($order->discounted)
-                                                                                    ({{ $order->price }} - {{ $order->discounted }} kr)
+                        ({{ $order->price }} - {{ $order->discounted }} kr)
                     @endif
                     <br/>
                     <strong>Faktureras:</strong> {{ number_format($order->invoiced) }} kr <br/>
                     <strong>Reseersättning:</strong>
-                    {{ $customer_details->distance_price }} kr <br/>
+                    {{ $order->to_customer_price }} kr <br/>
                 </div>
             </div>
         </div>
@@ -121,8 +121,16 @@
                                 </p>
                             @endif
 
+                            @if ($service->service->customer_materials === 'yes')
                             <span class="fw-medium">Har eget material:</span>
-                            {{ $service->service->has_own_materials ? 'Ja' : 'Nej' }}
+                            {{ $service->has_own_materials ? 'Ja' : 'Nej' }}
+                            @endif
+
+                            @if ($service->comments)
+                                <br/>
+                                <h6 class="fw-medium">Kommentar:</h6>
+                                {{ $service->comments }}
+                            @endif
                         </div>
                     </div>
                 </div>

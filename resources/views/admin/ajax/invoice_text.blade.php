@@ -9,64 +9,73 @@
 <div class="modal-body">
     <strong>Faktura för Order #{{ $order->order_id }}</strong><br>
     -----------------------------------<br>
-    <strong>Faktureras via:</strong> {{ $order->customer->billing_method }}<br><br>
 
-    @if($rutServices)
-    # <strong>RUT tjänster</strong><br>
-        @foreach ($rutServices as $service)
-            {{ $service->service->name }} ({{ $service->quantity }} st) - {{ $service->service->price * $service->quantity }} kr<br>
-            @if(is_array($service->service_options_array) && !empty($service->service_options_array))
-                @foreach($service->service_options_array as $option)
-    -- {{ $option['name'] }}: {{ $option['price'] }} kr<br>
-                @endforeach
+    Order #{{ $order->order_id }}<br>
+    Datum: {{ Carbon\Carbon::parse($order->date_time)->format('d/m-y - H:i') }}<br>
+    Adress: {{ $order->customer->address }}<br>
+    Pris: {{ $totalServices }} kr<br>
+    Faktureras via: {{ $order->customer->billing_method }}<br><br>
+
+    # Pris<br>
+    Timpris: 299 kr/timme<br><br>
+
+    # Tid<br>
+    Start: {{ $order->start_time }}<br>
+    Slut: {{ $order->end_time }}<br>
+    Total tid: {{ $totalTime }}<br><br>
+
+    # Tjänster<br>
+    @foreach ($services as $service)
+        {{ $service->service->name }} ({{ $service->quantity }} st) {{ $service->service->price * $service->quantity != 0 ? ': ' . $service->service->price . ' kr' : '' }}<br>
+        @foreach($service->service->service_options as $option)
+            @if(!$option->not_rut) <!-- Exkludera tjänstalternativ med non_rut här -->
+    -- {{ $option->name }} {{ $option->price != 0 ? '- ' . $option->price . ' kr' : '' }}<br>
             @endif
         @endforeach
-        <br>
-    @endif
+    @endforeach
+    <br>
 
-    @if($rotServices)
-    # <strong>ROT tjänster</strong><br>
-        @foreach ($rotServices as $service)
-            {{ $service->service->name }} ({{ $service->quantity }} st) - {{ $service->service->price * $service->quantity }} kr<br>
-            @if(is_array($service->service_options_array) && !empty($service->service_options_array))
-                @foreach($service->service_options_array as $option)
-    -- {{ $option['name'] }}: {{ $option['price'] }} kr<br>
-                @endforeach
-            @endif
-        @endforeach
-        <br>
-    @endif
+    -----------------------------------<br>
+    <strong>Totalt belopp:</strong> {{ $totalServices }} kr<br>
+    <strong>Faktureras:</strong> {{ $invoicedServices }} kr<br><br>
 
-    @if($otherServices)
-    # <strong>Andra tjänster (utan RUT/ROT)</strong><br>
-        @foreach ($otherServices as $service)
-            {{ $service->service->name }} ({{ $service->quantity }} st) - {{ $service->service->price * $service->quantity }} kr<br>
-            @if(is_array($service->service_options_array) && !empty($service->service_options_array))
-                @foreach($service->service_options_array as $option)
-    -- {{ $option['name'] }}: {{ $option['price'] }} kr<br>
-                @endforeach
-            @endif
-        @endforeach
-        <br>
-    @endif
+    ================<br>
+    <strong>Resefaktura för Order #{{ $order->order_id }}</strong><br>
+    ================<br>
 
-    # Reseersättning<br>
-    - Till kunden:<br>
+    Order #{{ $order->order_id }}<br>
+    Datum: {{ Carbon\Carbon::parse($order->date_time)->format('d/m-y - H:i') }}<br>
+    Adress: {{ $order->customer->address }}<br>
+    Faktureras via: {{ $order->customer->billing_method }}<br><br>
+
+    @if ($travelToCustomer['distance'])
+    # Reseersättning till kund<br>
     Avstånd: {{ $travelToCustomer['distance'] }} km<br>
     Tid: {{ $travelToCustomer['time'] }} min<br>
     Pris: {{ $travelToCustomer['price'] }} kr<br><br>
+    @endif
 
     @if($travelToLocation)
-    - Till återvinning<br>
+    # Reseersättning till återvinning<br>
     Avstånd: {{ $travelToLocation['distance'] }} km<br>
     Tid: {{ $travelToLocation['time'] }} min<br>
     Pris (enkel resa): {{ $travelToLocation['single_trip_price'] }} kr<br>
     Antal resor: {{ $travelToLocation['trips_count'] }}<br>
-    Totalt pris (flera resor): {{ $travelToLocation['total_price'] }} kr<br><br>
+    Totalt pris (flera resor): {{ $travelToLocation['total_price'] * $travelToLocation['trips_count'] }} kr<br><br>
     @endif
 
+    @foreach ($nonRutOptions as $option)
+        {{ $option->name }} {{ $option->price != 0 ? '- ' . $option->price . ' kr' : '' }}<br><br>
+    @endforeach
+
+    # Totalt Pris<br>
+    Totalt: {{ $totalNonRutAndTravel }} kr<br><br>
+
+    Avser reseersättning för tidigare fakturerat uppdrag med ovan Boknings-ID.<br><br>
+
     -----------------------------------<br>
-    <strong>Totalt belopp:</strong> {{ $total }} kr
+    <strong>Totalt belopp:</strong> {{ $totalNonRutAndTravel }} kr<br>
+    <strong>Faktureras:</strong> {{ $invoicedNonRutAndTravel }} kr<br><br>
 </div>
 
 <div class="modal-footer">

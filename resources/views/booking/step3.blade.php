@@ -200,7 +200,7 @@
                             <strong>Observera:</strong>
                             <ul class="mt-2 mb-0 pl-1 text-dark">
                                 <li>Priserna ovan är endast lösa uppskattningar och kan variera beroende på olika faktorer. Det slutgiltiga priset kan påverkas av olika omständigheter som uppstår under arbetets gång.</li>
-                                <li>Min taxa är 300 kr/timme (inklusive RUT), räknat från det att jag anländer till platsen tills arbetet är avslutat.</li>
+                                <li>Min taxa är 299 kr/timme (inklusive RUT), räknat från det att jag anländer till platsen tills arbetet är avslutat.</li>
                                 <li>Reseersättning och hyrning av släp kan inte faktureras tillsammans med RUT. Därför kommer du att få en separat faktura för dessa.</li>
                             </ul>
                         </div>
