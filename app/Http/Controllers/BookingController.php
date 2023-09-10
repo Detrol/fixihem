@@ -50,6 +50,7 @@ class BookingController extends Controller
             'expected_time' => session('expectedTime'),
             'price' => $price,
             'total_price' => $totalPrice,
+            'to_location_times' => session('travels'),
         ], $travelData);
 
         $extraTimeForDrive = 60;
@@ -405,12 +406,25 @@ class BookingController extends Controller
     {
         // Hantera data från steg 2, t.ex. kommentarer.
         $comments = $request->input('comment');
+        $travels = $request->input('to_location_times');
+
+        // Kolla om antalet turer är större än 1. Om det är det, lägg till 30 minuter för varje extra tur.
+        $extraTime = ($travels > 1) ? ($travels - 1) * 30 : 0;
+
+        // Hämta det nuvarande värdet av 'expected_time' från sessionen
+        $expectedTime = session('expected_time', 0); // om 'expected_time' inte finns, använd 0 som default
+        $expectedTime += $extraTime;
 
         // Hämta den tidigare sparade datan från sessionen
         $servicesData = session('servicesData');
 
         // Spara all relevant data i sessionen
-        session(['comments' => $comments, 'servicesData' => $servicesData]);
+        session([
+            'comments' => $comments,
+            'travels' => $travels,
+            'expected_time' => $expectedTime, // Spara den uppdaterade 'expected_time'
+            'servicesData' => $servicesData
+        ]);
 
         // Skicka användaren till steg 3
         return redirect()->route('booking.step3');
@@ -420,7 +434,21 @@ class BookingController extends Controller
     public function showStep3()
     {
         $data = $this->computeBookingData();
-        return view('booking.step3', $data);
+
+        $now = \Carbon\Carbon::now();
+
+        if ($now->month > 6 && $now->month <= 12) {
+            // Om det nu är efter juni men före december, sätt till mars nästa år.
+            $endDate = $now->copy()->addYear()->startOfMonth(3)->format('Y-m-d');
+        } elseif ($now->month > 12) {
+            // Om det är efter december, sätt till mars i år.
+            $endDate = $now->copy()->startOfMonth(3)->format('Y-m-d');
+        } else {
+            // Annars, behåll din nuvarande logik.
+            $endDate = $now->endOfYear()->format('Y-m-d');
+        }
+
+        return view('booking.step3', $data, compact('endDate'));
     }
 
     public function saveAddressToSession(Request $request)
@@ -608,9 +636,9 @@ class BookingController extends Controller
         $add_minutes = ($current_travel_time * 2) + 15;
 
         if (!isset($current_mission->expected_time)) {
-            $current_mission_end_from_now = Carbon::now()->addSeconds(max(session('expected_time'), 3600))->addMinutes($add_minutes)->tz('Europe/Stockholm');
+            $current_mission_end_from_now = Carbon::now()->addMinutes(max(session('expected_time'), 60))->addMinutes($add_minutes)->tz('Europe/Stockholm');
         } else {
-            $current_mission_end_from_now = Carbon::now()->addSeconds(max($current_mission->expected_time, 3600))->addMinutes($add_minutes)->tz('Europe/Stockholm');
+            $current_mission_end_from_now = Carbon::now()->addMinutes(max($current_mission->expected_time, 60))->addMinutes($add_minutes)->tz('Europe/Stockholm');
         }
         $current_mission_length = roundUpToAny($current_mission_end_from_now->diffInMinutes(Carbon::now()));
 
@@ -618,7 +646,7 @@ class BookingController extends Controller
         $end = $end->subMinutes($current_mission_length);
 
         foreach ($missions_today as $mission) {
-
+            $db = false;
             if (isset($mission->to_customer_time)) {
                 $mission_travel_time = $mission->to_customer_time;
             } else {
@@ -629,6 +657,8 @@ class BookingController extends Controller
                 } else {
                     $mission_travel_time = DB::connection('second_db')->table('customer_details')->where('order_id', $mission->order_id)->first()->travel_time;
                 }
+
+                $db = true;
             }
 
             $mission_travel_time = roundUpToAny($mission_travel_time);
@@ -644,7 +674,12 @@ class BookingController extends Controller
 
             $add_minutes = $mission_travel_time + 15;
 
-            $mission_end = Carbon::parse($date)->addSeconds(max($mission->expected_time, 3600))->addMinutes($add_minutes)->tz('Europe/Stockholm');
+            if ($db) {
+                $mission_end = Carbon::parse($date)->addSeconds(max($mission->expected_time, 3600))->addMinutes($add_minutes)->tz('Europe/Stockholm');
+            } else {
+                $mission_end = Carbon::parse($date)->addMinutes(max($mission->expected_time, 60))->addMinutes($add_minutes)->tz('Europe/Stockholm');
+            }
+
             $busy_between->add(['start' => $mission_start, 'end' => $mission_end]);
         }
 

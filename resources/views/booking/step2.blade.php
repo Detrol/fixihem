@@ -77,6 +77,14 @@
                                         <span class="d-block fs-6 text-warning">ROT-berättigad</span>
                                     @endif--}}
 
+                                    @if ($service['drive_location'] === 'recycling')
+                                        <p class="mt-3 small">Uppge gärna en uppskattning på hur många resor du tror krävs till återvinningscentralen.</p>
+                                        <div class="form-group">
+                                            <label for="toLocationTimes">Antal resor till återvinningscentral:</label>
+                                            <input type="number" id="toLocationTimes" name="to_location_times" value="1" class="form-control">
+                                        </div>
+                                    @endif
+
                                     <div class="mt-3">
                                         <label for="comment_{{ $serviceId }}">Kommentar:</label>
                                         <textarea name="comment[{{ $serviceId }}]" id="comment_{{ $serviceId }}"

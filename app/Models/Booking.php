@@ -25,7 +25,8 @@ class Booking extends Model
         'to_location_price',
         'email_reminder',
         'sms_reminder',
-        'status'
+        'status',
+        'to_location_times'
     ];
 
     public function getStatusNameAttribute() {

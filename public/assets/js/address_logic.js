@@ -2,6 +2,8 @@ let token = document.querySelector('meta[name="csrf-token"]').getAttribute('cont
 let initialTotalPrice = parseFloat(document.getElementById('price-container').getAttribute('data-total-price')) || 300;
 console.log("Initial value of initialTotalPrice:", initialTotalPrice);
 let serviceTypeForDriveLocation;
+const numberOfTrips = parseInt(document.getElementById('numberOfTrips').getAttribute('data-travels')) || 1;
+const getById = id => document.getElementById(id);
 
 console.log("Initial Total Price:", initialTotalPrice);
 
@@ -35,55 +37,20 @@ $(document).ready(function() {
     });
 });
 
+function calculateTotalPrice() {
+    // Summa av de olika delpriserna
+    const driveToRecyclingCost = parseFloat(getById('recycling-price').textContent) || 0;
+    const driveToYouCost = parseFloat(getById('travel-price').textContent) || 0;
+    const timeCost = parseFloat(getById('time-price').textContent) || 0;
 
-$('#datepicker').datepicker({
-    startView: 0,
-    todayBtn: false,
-    keyboardNavigation: false,
-    forceParse: true,
-    autoclose: false,
-    format: "yyyy-mm-dd",
-    language: 'sv',
-    calendarWeeks: true,
-    daysOfWeekDisabled: '6,0',
-    todayHighlight: true,
-    datesDisabled: '',
-    startDate: '',
-    endDate: '',
-    updateViewDate: false
-}).on('changeDate', function () {
-    $('#my_hidden_input').val(
-        $('#datepicker').datepicker('getFormattedDate')
-    );
+    console.log("driveToRecyclingCost:", driveToRecyclingCost);
+    console.log("driveToYouCost:", driveToYouCost);
+    console.log("timeCost:", timeCost);
 
-    $.ajax({
-        type: 'GET',
-        url: '/check-date',
-        dataType: "json",
-        data: {
-            date: $('#my_hidden_input').val(),
-            _token: token,
-        },
-        success: function (data) {
-            $("#time").prop('disabled', false);
-
-            let len = data.length;
-
-            $("#time").empty();
-            for (let i = 0; i < len; i++) {
-                let name = data[i];
-                //alert(name);
-
-                $("#time").append("<option value='" + name + "'>" + name + "</option>");
-            }
-        }
-    });
-});
-
-
+    return initialTotalPrice + driveToRecyclingCost + driveToYouCost + timeCost;
+}
 
 function calculateDriveCost(distance, duration, serviceType) {
-    console.log("calculateDriveCost called with serviceType:", serviceType);
     const drivePricePerKm = 10;
     const driveCost = distance * drivePricePerKm;
 
@@ -91,7 +58,6 @@ function calculateDriveCost(distance, duration, serviceType) {
     if (serviceType === 'recycling' && duration !== undefined) {
         const driveTimeCostPerHour = 299;
         timeCost = (duration/60) * driveTimeCostPerHour;
-        console.log("Time cost added:", timeCost);
     }
 
     return {
@@ -105,7 +71,7 @@ function updateTotalPrice(driveCost, timeCost) {
     console.log("Drive Cost:", driveCost);
     console.log("Time Cost:", timeCost);
 
-    initialTotalPrice += driveCost + timeCost;
+    initialTotalPrice += (driveCost + timeCost) * numberOfTrips;
 
     console.log("After update:", initialTotalPrice);
 }
@@ -117,13 +83,12 @@ function updateTimeCost(duration) {
     const timeCost = (duration/60) * timeCostPerHour;
     console.log("Time cost in updateTimeCost:", timeCost);
 
-    initialTotalPrice += timeCost;
+    initialTotalPrice += timeCost * numberOfTrips;
     console.log("After updateTimeCost, total price:", initialTotalPrice);
 
 }
 
 function updateDriveLocationUI(data) {
-    console.log("Data in updateDriveLocationUI:", data);
     if (!data || !data.distance) {
         console.error("Distance data is missing!", data);
         return 0;
@@ -144,15 +109,33 @@ function updateDriveLocationUI(data) {
     }
 
     const recyclingPriceElements = document.getElementsByClassName('recycling-price');
-    for(let el of recyclingPriceElements) {
-        el.textContent = driveLocationTotalPrice.toFixed(2);
+    for (let i = 0; i < recyclingPriceElements.length; i++) {
+        recyclingPriceElements[i].textContent = (driveLocationTotalPrice * numberOfTrips * 2).toFixed(2);
+    }
+
+    const timePriceElement = document.getElementById('time-price');
+    if (timePriceElement && data.timeCost !== undefined) {
+        timePriceElement.textContent = (data.timeCost * numberOfTrips).toFixed(2);
     }
 
     document.getElementById('loading').classList.add('invisible');
 
-    return driveLocationTotalPrice; // Returnera kostnaden för resan till återvinningscentralen
-}
+    const tripsElement = document.getElementById('number-of-trips');
+    if (tripsElement) {
+        tripsElement.textContent = numberOfTrips;
+    }
 
+    // Uppdatera värdet för endast en tur
+    const singleTripRecyclingPriceElement = document.getElementById('single-trip-recycling-price');
+    if (singleTripRecyclingPriceElement) {
+        singleTripRecyclingPriceElement.textContent = driveLocationTotalPrice.toFixed(2);
+    }
+
+    return {
+        driveLocationTotalPrice: driveLocationTotalPrice,
+        timeCostForRecycling: (data.duration/60) * 299 * numberOfTrips * 2
+    };
+}
 
 function updateAddressUI(data, serviceTypeForDriveLocation) {
     if (serviceTypeForDriveLocation === 'recycling') {
@@ -198,19 +181,10 @@ function updateAddressUI(data, serviceTypeForDriveLocation) {
             .then(response => response.json())
             .then(data => {
                 const costs = calculateDriveCost(data.distance, null, serviceTypeForDriveLocation);
-                console.log("Costs for customer drive:", costs);
-                updateTotalPrice(costs.driveCost, costs.timeCost);
-
                 getById('calculated-distance').textContent = data.distance.toFixed(2);
                 getById('travel-price').textContent = costs.driveCost.toFixed(2);
                 getById('distance-info').style.display = 'block';
 
-                if (!serviceTypeForDriveLocation) {
-                    getById('time-price').textContent = "0.00";
-                    getById('preliminary-price').textContent = initialTotalPrice.toFixed(2) + " kr";
-                }
-
-                console.log("Service type for drive location:", serviceTypeForDriveLocation);
                 if (serviceTypeForDriveLocation) {
                     document.getElementById('loading').classList.remove('invisible');
 
@@ -229,23 +203,20 @@ function updateAddressUI(data, serviceTypeForDriveLocation) {
                     })
                         .then(response => response.json())
                         .then(recyclingData => {
-                            const recyclingDriveCost = updateDriveLocationUI(recyclingData);
-
-                            const driveTimeCostPerHour = 299;
-                            const timeCostForRecycling = (recyclingData.duration/60) * driveTimeCostPerHour;
-                            updateTotalPrice(recyclingDriveCost, timeCostForRecycling);
-
-                            getById('time-price').textContent = timeCostForRecycling.toFixed(2) + " kr";
-                            getById('preliminary-price').textContent = initialTotalPrice.toFixed(2) + " kr";
+                            const recyclingCosts = updateDriveLocationUI(recyclingData);
+                            getById('time-price').textContent = recyclingCosts.timeCostForRecycling.toFixed(2);
                             return recyclingData;
                         });
                 } else {
-                    getById('preliminary-price').textContent = initialTotalPrice.toFixed(2) + " kr";
                     return data;
                 }
             })
             .then(finalData => {
                 updateAddressUI(finalData, serviceTypeForDriveLocation);
+
+                // Nu när all information har samlats och UI uppdaterats, beräknar vi totalpriset
+                const totalPrice = calculateTotalPrice();
+                getById('preliminary-price').textContent = totalPrice.toFixed(2) + " kr";
             })
             .catch(error => {
                 console.error('Error:', error);

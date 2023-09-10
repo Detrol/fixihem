@@ -51,68 +51,7 @@
         </div>
         <!-- End Hero -->
 
-        {{--<!-- Icon Blocks -->
-        <div class="container content-space-t-2 content-space-t-lg-3">
-            <div class="row">
-                <div class="col-sm-6 col-lg mb-5 mb-lg-0">
-                    <!-- Icon Block -->
-                    <div class="text-center">
-                        <div class="mb-3">
-                            <i class="bi-phone fs-1 text-dark"></i>
-                        </div>
 
-                        <h5>Responsive</h5>
-                        <span class="d-block">Responsive, and mobile-first project on the web</span>
-                    </div>
-                    <!-- End Icon Block -->
-                </div>
-                <!-- End Col -->
-
-                <div class="col-sm-6 col-lg mb-5 mb-lg-0">
-                    <!-- Icon Block -->
-                    <div class="text-center">
-                        <div class="mb-3">
-                            <i class="bi-toggles2 fs-1 text-dark"></i>
-                        </div>
-
-                        <h5>Customizable</h5>
-                        <span class="d-block">Components are easily customized</span>
-                    </div>
-                    <!-- End Icon Block -->
-                </div>
-                <!-- End Col -->
-
-                <div class="col-sm-6 col-lg mb-5 mb-sm-0">
-                    <!-- Icon Block -->
-                    <div class="text-center">
-                        <div class="mb-3">
-                            <i class="bi-file-earmark-text fs-1 text-dark"></i>
-                        </div>
-
-                        <h5>Documentation</h5>
-                        <span class="d-block">Every component and plugin is well documented</span>
-                    </div>
-                    <!-- End Icon Block -->
-                </div>
-                <!-- End Col -->
-
-                <div class="col-sm-6 col-lg">
-                    <!-- Icon Block -->
-                    <div class="text-center">
-                        <div class="mb-3">
-                            <i class="bi-chat-right-dots fs-1 text-dark"></i>
-                        </div>
-
-                        <h5>24/7 Support</h5>
-                        <span class="d-block">Contact us 24 hours a day, 7 days a week.</span>
-                    </div>
-                    <!-- End Icon Block -->
-                </div>
-                <!-- End Col -->
-            </div>
-            <!-- End Row -->
-        </div>
-        <!-- End Icon Blocks -->--}}
 
         <!-- Features -->
         <div class="overflow-hidden">
@@ -224,6 +163,18 @@
             </div>
         </div>
 
+        <!-- CTA -->
+        <div class="content-space-1 bg-light">
+            <div class="w-lg-75 text-center mx-lg-auto">
+                <h3 class="mb-4">Är du intresserad av fönsterputs?</h3>
+                <figure class="mb-4">
+                    <img class="img-fluid" src="{{ asset('assets/img/putsikarlstad.png') }}" alt="Image Description" style="height: 4rem;">
+                </figure>
+                <a class="link link-pointer" href="https://putsikarlstad.se" target="_blank">Klicka här för att besöka min andra verksamhet!</a>
+            </div>
+        </div>
+        <!-- End CTA -->
+
         <!--<div id="stickyPopup" class="sticky-popup bg-dark text-white rounded align-items-center justify-content-center">
             <span id="rutText" class="me-2"></span>
             <span id="totalPrice" data-current-price="0" class="me-2">0.00</span> kr
@@ -233,18 +184,11 @@
             </button>
         </div>-->
 
-        <div id="stickyPopup" class="sticky-popup bg-dark text-white rounded align-items-center justify-content-center">
-            <span id="rutText" class="me-2"></span>
-            <span id="totalTime" data-current-time="0" class="me-2">0</span>
-            <button type="submit" form="bookingForm" class="btn btn-primary btn-sm ms-3 go-forward-btn">
-                <span>Gå vidare</span>
-                <i class="fa fa-angle-right ms-lg-2"></i>
-            </button>
-        </div>
+
 
 
         <!-- Post a Comment -->
-        <div class="container pb-10">
+        <div class="container content-space-1">
             <!-- Heading -->
             <div class="w-lg-65 text-center mx-lg-auto mb-7">
                 <h3>Saknar du någon tjänst?</h3>
@@ -296,6 +240,15 @@
         </div>
         <!-- End Post a Comment -->
     </main>
+
+    <div id="stickyPopup" class="sticky-popup bg-dark text-white rounded align-items-center justify-content-center">
+        <span id="rutText" class="me-2"></span>
+        <span id="totalTime" data-current-time="0" class="me-2">0</span>
+        <button type="submit" form="bookingForm" class="btn btn-primary btn-sm ms-3 go-forward-btn">
+            <span>Gå vidare</span>
+            <i class="fa fa-angle-right ms-lg-2"></i>
+        </button>
+    </div>
 
 @endsection
 

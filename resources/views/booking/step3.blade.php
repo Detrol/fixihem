@@ -50,7 +50,7 @@
                                     class="recycling-distance"></span> km
                             </li>
                             <li><i class="fas fa-coins mr-2"></i> Reseersättning för en tur: <span
-                                    class="recycling-price"></span> kr
+                                    id="single-trip-recycling-price"></span> kr
                             </li>
                         </ul>
                         <p class="mb-0">Kom ihåg att det är ditt ansvar att säkerställa att det är öppet den dag och tid du har bokat hjälp.</p>
@@ -168,16 +168,19 @@
                                     <li class="list-group-item">
                                         <i class="fas fa-car mr-2"></i>
                                         Reseersättning till återvinning: <strong
-                                            class="recycling-price"></strong> kr
+                                            class="recycling-price" id="recycling-price"></strong> kr
                                     </li>
                                     <li class="list-group-item">
                                         <i class="fa fa-clock mr-2"></i>
                                         Researbetskostnad: <strong id="time-price"></strong> kr
                                     </li>
+                                    <li class="list-group-item">
+                                        <i class="fa fa-repeat mr-2"></i>
+                                        Antal turer: <strong id="number-of-trips"></strong> (x2)
+                                        <i class="fa fa-info-circle ml-2" data-toggle="tooltip" title="Antalet turer dubblas med det antal du angav i
+föregående steg, eftersom vi räknar med tur/retur här, det gäller också priserna ovan."></i>
+                                    </li>
                                 </ul>
-                                <p class="mb-0">
-                                    Kom ihåg att ovan priser gäller för en tur.
-                                </p>
                             </div>
 
                             <!-- Prisinformation kolumn -->
@@ -296,6 +299,8 @@
         </div>
     </main>
 
+    <div id="numberOfTrips" data-travels="{{ session('travels') }}"></div>
+
 @endsection
 
 @push('js')
@@ -305,6 +310,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="/assets/js/address_logic.js"></script>
     <script src="/assets/js/sticky.js"></script>
+    <script src="{{ url('https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js') }}"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-sidebar/3.3.1/jquery.sticky-sidebar.min.js"></script>
 
@@ -314,9 +320,57 @@
         {!! json_encode(array_column($servicesData, 'drive_location')) !!}
     </script>
 
-    <!-- Skript för att visa 'drive-location-info' om det finns någon tjänst med 'drive_location' -->
     <script>
+        $(document).ready(function() {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
 
+        $('#personal_number').mask('00000000-0000', {placeholder: "_________-____"});
+        $('#postal_code').mask('000 00', {placeholder: "___ __"});
+
+        $('#datepicker').datepicker({
+            startView: 0,
+            todayBtn: false,
+            keyboardNavigation: false,
+            forceParse: true,
+            autoclose: false,
+            format: "yyyy-mm-dd",
+            language: 'sv',
+            calendarWeeks: true,
+            daysOfWeekDisabled: '6,0',
+            todayHighlight: true,
+            datesDisabled: '',
+            startDate: '{{ \Carbon\Carbon::tomorrow()->format('Y-m-d') }}',
+            endDate: '{{ $endDate }}',
+            updateViewDate: false
+        }).on('changeDate', function () {
+            $('#my_hidden_input').val(
+                $('#datepicker').datepicker('getFormattedDate')
+            );
+
+            $.ajax({
+                type: 'GET',
+                url: '/check-date',
+                dataType: "json",
+                data: {
+                    date: $('#my_hidden_input').val(),
+                    _token: token,
+                },
+                success: function (data) {
+                    $("#time").prop('disabled', false);
+
+                    let len = data.length;
+
+                    $("#time").empty();
+                    for (let i = 0; i < len; i++) {
+                        let name = data[i];
+                        //alert(name);
+
+                        $("#time").append("<option value='" + name + "'>" + name + "</option>");
+                    }
+                }
+            });
+        });
     </script>
 @endpush
 

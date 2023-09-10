@@ -121,6 +121,10 @@
                                 </p>
                             @endif
 
+                            @if ($service->service->drive_location === 'recycling')
+                                Antal turer: {{ $order->to_location_times }}<br><br>
+                            @endif
+
                             @if ($service->service->customer_materials === 'yes')
                             <span class="fw-medium">Har eget material:</span>
                             {{ $service->has_own_materials ? 'Ja' : 'Nej' }}
