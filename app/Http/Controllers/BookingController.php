@@ -583,10 +583,17 @@ class BookingController extends Controller
         try {
             // Hämta data från andra databasen
             $missionsFromSecondDb = DB::connection('second_db')->table('customer_bookings')->whereIn('status', ['1', '2'])->get();
+            $visitsFromSecondDb = DB::connection('second_db')->table('customer_visits')->where('status', 1)->get();
 
             foreach ($missionsFromSecondDb as $mission) {
                 if (Carbon::parse($mission->date)->tz('Europe/Stockholm')->format('Y-m-d') == $request->date) {
                     $missions_today->add($mission);
+                }
+            }
+
+            foreach ($visitsFromSecondDb as $visit) {
+                if (Carbon::parse($visit->date)->tz('Europe/Stockholm')->format('Y-m-d') == $request->date) {
+                    $missions_today->add($visit);
                 }
             }
         } catch (\Exception $e) {
@@ -652,6 +659,28 @@ class BookingController extends Controller
         if ($specialTimes?->from && $specialTimes?->to) {
             $busy_between->add(['start' => Carbon::parse($request->date . ' ' . $specialTimes->from)->tz('Europe/Stockholm'), 'end' => Carbon::parse($request->date . ' ' . $specialTimes->to)->tz('Europe/Stockholm')]);
         }*/
+
+        try {
+            // Hämta data från andra databasen
+            $reservedTimes = DB::connection('second_db')->table('reserved_times')->where('date', Carbon::parse($request->date)->format('Y-m-d'))->first();
+            $specialTimes = DB::connection('second_db')->table('special_times')->where('date', Carbon::parse($request->date)->format('Y-m-d'))->first();
+
+            // RESERVED TIMES
+            if ($reservedTimes?->from && $reservedTimes?->to) {
+                $busy_between->add(['start' => Carbon::parse($request->date . ' ' . $reservedTimes->from)->tz('Europe/Stockholm'), 'end' => Carbon::parse($request->date . ' ' . $reservedTimes->to)->tz('Europe/Stockholm')]);
+            }
+
+            // SPECIAL TIMES
+            if ($specialTimes?->from && $specialTimes?->to) {
+                $busy_between->add(['start' => Carbon::parse($request->date . ' ' . $specialTimes->from)->tz('Europe/Stockholm'), 'end' => Carbon::parse($request->date . ' ' . $specialTimes->to)->tz('Europe/Stockholm')]);
+            }
+        } catch (\Exception $e) {
+            // Här hanteras eventuella fel som uppstår när du försöker ansluta till den andra databasen eller hämta data
+            // Du kan logga felet eller göra något annat beroende på ditt behov
+            \Log::error("Error connecting to second database: " . $e->getMessage());
+        }
+
+
 
         $busy_times = collect();
 
