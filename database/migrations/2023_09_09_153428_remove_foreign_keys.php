@@ -20,9 +20,9 @@ return new class extends Migration
             $table->dropForeign('booking_services_service_id_foreign');
         });
 
-        Schema::table('customers', function (Blueprint $table) {
+        /*Schema::table('customers', function (Blueprint $table) {
             $table->dropForeign('customers_order_id_foreign');
-        });
+        });*/
 
         Schema::table('services', function (Blueprint $table) {
             $table->dropForeign('services_category_id_foreign');
