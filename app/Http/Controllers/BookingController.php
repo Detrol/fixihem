@@ -47,7 +47,7 @@ class BookingController extends Controller
         $bookingData = array_merge($bookingData, [
             'date_time' => $dateTime,
             'status' => 1,
-            'expected_time' => session('expectedTime'),
+            'expected_time' => session('expected_time'),
             'price' => $price,
             'total_price' => $totalPrice,
             'to_location_times' => session('travels'),
@@ -408,8 +408,8 @@ class BookingController extends Controller
         $comments = $request->input('comment');
         $travels = $request->input('to_location_times');
 
-        // Kolla om antalet turer är större än 1. Om det är det, lägg till 30 minuter för varje extra tur.
-        $extraTime = ($travels > 1) ? ($travels - 1) * 30 : 0;
+        // Kolla om antalet turer är större än 1. Om det är det, lägg till 15 minuter för varje extra tur.
+        $extraTime = ($travels > 1) ? ($travels - 1) * 15 : 0;
 
         // Hämta det nuvarande värdet av 'expected_time' från sessionen
         $expectedTime = session('expected_time', 0); // om 'expected_time' inte finns, använd 0 som default

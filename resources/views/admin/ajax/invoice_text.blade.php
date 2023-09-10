@@ -61,7 +61,7 @@
     Tid: {{ $travelToLocation['time'] }} min<br>
     Pris (enkel resa): {{ $travelToLocation['single_trip_price'] }} kr<br>
     Antal resor: {{ $travelToLocation['trips_count'] }}<br>
-    Totalt pris (flera resor): {{ $travelToLocation['total_price'] * $travelToLocation['trips_count'] }} kr<br><br>
+    Totalt pris (flera resor): {{ $travelToLocation['total_price'] }} kr<br><br>
     @endif
 
     @foreach ($nonRutOptions as $option)
