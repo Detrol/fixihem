@@ -36,7 +36,7 @@
                 <div class="col-lg-6">
                     <div class="position-relative">
                         <div class="position-relative">
-                            <img class="img-fluid" src="./assets/img/950x950/img1.jpg" alt="Image Description">
+                            <img class="img-fluid" src="./assets/img/jag1.jpg" alt="Image Description">
 
                             <div class="position-absolute bottom-0 end-0">
                                 <img class="w-100" src="./assets/svg/illustrations/cubics.svg" alt="SVG"
@@ -107,7 +107,7 @@
                                                     @foreach($service->service_options as $option)
                                                         <div class="form-check" style="z-index: 2;">
                                                             <input type="checkbox" id="option{{ $option->id }}"
-                                                                   class="form-check-input" name="options[]"
+                                                                   class="form-check-input {{ $option->is_required ? 'required-option' : '' }}" name="options[]"
                                                                    data-price="{{ $option->price ?? 0 }}"
                                                                    data-estimated-minutes="{{ $option->estimated_minutes }}"
                                                                    data-has-quantity="{{ $option->has_quantity }}"
@@ -244,7 +244,7 @@
     <div id="stickyPopup" class="sticky-popup bg-dark text-white rounded align-items-center justify-content-center">
         <span id="rutText" class="me-2"></span>
         <span id="totalTime" data-current-time="0" class="me-2">0</span>
-        <button type="submit" form="bookingForm" class="btn btn-primary btn-sm ms-3 go-forward-btn">
+        <button id="submitForm" type="submit" form="bookingForm" class="btn btn-primary btn-sm ms-3 go-forward-btn">
             <span>Gå vidare</span>
             <i class="fa fa-angle-right ms-lg-2"></i>
         </button>
@@ -256,11 +256,22 @@
     <script src="/assets/js/home.js"></script>
     <script>
         $(document).ready(function() {
-            $('.service-name').on('click', function(event) {
-                const serviceId = $(this).data('service-id');
-                const checkbox = $(`#service${serviceId}`);
-                checkbox.prop('checked', !checkbox.prop('checked')).trigger('change'); // Växlar checkboxens tillstånd och triggar ett 'change'-event
+            $('.service-wrapper').on('click', function(event) {
+                const checkbox = $(this).find('.service-checkbox');
+
+                // Om klick-eventet kom från kryssrutan själv eller från tjänstens namn, låt det passera igenom normalt
+                if ($(event.target).hasClass('service-checkbox') || $(event.target).hasClass('service-name')) {
+                    checkbox.prop('checked', !checkbox.prop('checked')).trigger('change');
+                    return;
+                }
+
+                // Om tjänsten inte är vald, tillåt valet
+                if (!checkbox.prop('checked')) {
+                    checkbox.prop('checked', true).trigger('change');
+                }
             });
+
+            $('.service-name').off('click'); // Tar bort tidigare 'click'-händelse för att förhindra dubbelt klickbeteende
         });
     </script>
 @endpush

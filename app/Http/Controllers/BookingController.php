@@ -53,14 +53,14 @@ class BookingController extends Controller
             'to_location_times' => session('travels'),
         ], $travelData);
 
-        $extraTimeForDrive = 60;
+        /*$extraTimeForDrive = 60;
 
         foreach (session('servicesData') as $service) {
             if ($service['drive_location'] === 'recycling') {
                 $bookingData['expected_time'] += $extraTimeForDrive;
                 break;
             }
-        }
+        }*/
 
         try {
             DB::transaction(function () use ($bookingData, $request) {
@@ -124,7 +124,7 @@ class BookingController extends Controller
                 // Handle the case where the email could not be sent
             }
 
-            session()->keep('login_web_' . sha1(\App\Http\Controllers\Controller::class));
+            session()->forget(['services', 'options', 'service_quantity', 'has_material', 'option_quantity', 'toralPrice', 'price', 'expected_time', 'serviceData', 'comments', 'travels']);
 
             return redirect()->route('home')->with('status', 'Bokning skapad!');
         } catch (\Exception $e) {
@@ -210,7 +210,9 @@ class BookingController extends Controller
 
         session(['totalPrice' => $totalPrice]);
         session(['price' => $servicePriceWithoutTravel]);
-        session(['expectedTime' => $totalDuration]);
+        if(!session()->has('expected_time')) {
+            session(['expected_time' => $totalDuration]);
+        }
         session(['servicesData' => $servicesData]);
 
         $containsROT = $rotPrice > 0;
@@ -409,7 +411,7 @@ class BookingController extends Controller
         $travels = $request->input('to_location_times');
 
         // Kolla om antalet turer är större än 1. Om det är det, lägg till 15 minuter för varje extra tur.
-        $extraTime = ($travels > 1) ? ($travels - 1) * 15 : 0;
+        $extraTime = ($travels > 1) ? ($travels - 1) * 30 : 0;
 
         // Hämta det nuvarande värdet av 'expected_time' från sessionen
         $expectedTime = session('expected_time', 0); // om 'expected_time' inte finns, använd 0 som default

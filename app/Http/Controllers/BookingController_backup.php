@@ -25,7 +25,7 @@ class BookingController extends Controller
 
         // Hämta data från sessionen
         $sessionData = [
-            'expected_time' => session('expectedTime'),
+            'expected_time' => session('expected_time'),
         ];
 
         $travelData = [
@@ -182,7 +182,7 @@ class BookingController extends Controller
 
         session(['approximatePrice' => $approximatePrice]);  // Spara det i sessionen för framtida referens
         session(['price' => $servicePriceWithoutTravel]);
-        session(['expectedTime' => $totalDuration]);
+        session(['expected_time' => $totalDuration]);
         session(['servicesData' => $servicesData]);
 
         $containsROT = $rotPrice > 0;

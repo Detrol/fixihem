@@ -47,6 +47,10 @@
     display: block; /* visa när det är synligt */
 }
 
+#submitForm {
+    z-index: 999999;
+}
+
 @media (max-width: 576px) { /* Bootstrap breakpoint för små enheter */
     .sticky-popup,
     .sticky-popup-visible {

@@ -1,6 +1,54 @@
 $(document).ready(function() {
     $('#stickyPopup').hide();
 
+    // Uppdatera knappens status när tjänster eller undertjänster ändras
+    $(".service-checkbox, .form-check-input[name='options[]']").on('change', function() {
+        updateSubmitButtonStatus();
+    });
+
+    // Kör denna vid start så att knappen har rätt status från början
+    updateSubmitButtonStatus();
+
+    // Uppdaterar knappens status och tooltip
+    function updateSubmitButtonStatus() {
+        const btn = $("#submitForm");
+
+        if (isValidServiceSelection()) {
+            btn.prop('disabled', false);
+            btn.tooltip('hide');
+        } else {
+            btn.prop('disabled', true);
+            // Ta bort den här raden -> btn.tooltip('show');
+        }
+    }
+
+    function isValidServiceSelection() {
+        let isValid = true;
+
+        // Loopa igenom alla tjänsterna
+        $(".service-checkbox").each(function() {
+            // Om tjänsten är vald
+            if ($(this).prop('checked')) {
+                // Kolla om det finns obligatoriska undertjänster för denna tjänst
+                let requiredSubservices = $(this).closest('.service-wrapper').find('.form-check-input.required-option');
+
+                if (requiredSubservices.length > 0) {
+                    // Om det finns obligatoriska undertjänster, kolla om minst en av dem är vald
+                    let hasRequiredOptionChecked = requiredSubservices.filter(":checked").length > 0;
+
+                    if (!hasRequiredOptionChecked) {
+                        isValid = false;
+                        return false; // Avbryter .each loopen
+                    }
+                }
+            }
+        });
+
+        return isValid;
+    }
+
+
+
     function calculateEstimatedTime(serviceElement) {
         let quantity = parseFloat(serviceElement.closest('.service-wrapper').find('input[type="number"]').val()) || 1;
         let baseTime = parseFloat(serviceElement.data('estimated-minutes')) || 0;

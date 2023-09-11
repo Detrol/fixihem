@@ -68,7 +68,7 @@
                     {{ \Carbon\Carbon::parse($order->order_date)->format('d/m - H:i') }}<br/>
                     <strong>Datum/tid:</strong>
                     {{ \Carbon\Carbon::parse($order->date_time)->format('d/m - H:i') }}<br/>
-                    <strong>Pris:</strong> {{ number_format($order->total_price) }} kr
+                    <strong>Uppskattat pris:</strong> {{ number_format($order->expected_time) }} kr
                     @if ($order->discounted)
                         ({{ $order->price }} - {{ $order->discounted }} kr)
                     @endif

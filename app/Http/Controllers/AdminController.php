@@ -64,7 +64,7 @@ class AdminController extends Controller
             $order_details[$order->id]['name'] = $customer_details->first_name . ' ' . $customer_details->last_name;
             $order_details[$order->id]['address'] = $customer_details->address;
             $order_details[$order->id]['date'] = Carbon::parse($order->date)->format('d/m-y - H:i');
-            $order_details[$order->id]['price'] = $order->total_price;
+            $order_details[$order->id]['price'] = $order->expected_price;
             $order_details[$order->id]['paid'] = $order_details[$order->id]['price'] * ((100 - 6 - 12.22) / 100);
             $order_details[$order->id]['distance_price'] = $order->to_customer_price;
             $order_details[$order->id]['travel_time'] = CarbonInterval::minutes($customer_details->travel_time)->cascade();
@@ -73,7 +73,7 @@ class AdminController extends Controller
             $order_details[$order->id]['start'] = $order->start_time;
             $order_details[$order->id]['stop'] = $order->end_time;
             $order_details[$order->id]['minutesWorked'] = Carbon::parse($order->start_time)->diffInMinutes($order->end_time);
-            $order_details[$order->id]['hourlyRate'] = ($order_details[$order->id]['minutesWorked'] > 0) ? ($order->EndPriceTotal * 60) / $order_details[$order->id]['minutesWorked'] : 0;
+            $order_details[$order->id]['hourlyRate'] = ($order_details[$order->id]['minutesWorked'] > 0) ? ($order->end_price_rut * 60) / $order_details[$order->id]['minutesWorked'] : 0;
             $order_details[$order->id]['hourlyRateNet'] = $order_details[$order->id]['hourlyRate'] * 0.8;  // Antar att netto är 80% av bruttot.
         }
 
@@ -101,7 +101,7 @@ class AdminController extends Controller
             $order_details[$order->id]['address'] = $customer_details->address;
             $order_details[$order->id]['name'] = $customer_details->first_name . ' ' . $customer_details->last_name;
             $order_details[$order->id]['date'] = Carbon::parse($order->date_time)->format('d/m-y - H:i');
-            $order_details[$order->id]['price'] = $order->total_price;
+            $order_details[$order->id]['price'] = $order->expected_price;
             $order_details[$order->id]['paid'] = $order_details[$order->id]['price'] * ((100 - 6 - 12.22) / 100);
             $order_details[$order->id]['distance_price'] = $order->to_customer_price;
             $order_details[$order->id]['travel_time'] = CarbonInterval::minutes($order->to_customer_time)->cascade();
@@ -111,13 +111,14 @@ class AdminController extends Controller
             $order_details[$order->id]['stop'] = $order->end_time;
             $order_details[$order->id]['status'] = $order->status;
             $order_details[$order->id]['minutesWorked'] = Carbon::parse($order->start_time)->diffInMinutes($order->end_time);
-            $order_details[$order->id]['hourlyRate'] = ($order_details[$order->id]['minutesWorked'] > 0) ? ($order->EndPriceTotal * 60) / $order_details[$order->id]['minutesWorked'] : 0;
+            $order_details[$order->id]['hourlyRate'] = ($order_details[$order->id]['minutesWorked'] > 0) ? ($order->end_price_rut * 60) / $order_details[$order->id]['minutesWorked'] : 0;
             $order_details[$order->id]['hourlyRateNet'] = $order_details[$order->id]['hourlyRate'] * 0.8;  // Antar att netto är 80% av bruttot.
             $order_details[$order->id]['spontaneous'] = $order->spontaneous;
-            $order_details[$order->id]['customer_price'] = $order->customer_price + $order->to_customer_price;
+            $order_details[$order->id]['customer_price'] = $order->end_price_rut + $order->end_price_non_rut;
+            /*$order_details[$order->id]['customer_price'] = $order->customer_price + $order->to_customer_price;
             if ($order->to_location_distance !== null) {
                 $order_details[$order->id]['customer_price'] += $order->to_location_price * $order->to_location_times;
-            }
+            }*/
             $order_details[$order->id]['net_earnings'] = $order->net_earnings;
         }
 
@@ -125,9 +126,9 @@ class AdminController extends Controller
         $earning_before = 0;
         foreach ($bookings as $booking) {
             if ($booking->customer_type === 1) {
-                $earning += $booking->total_price * ((100 - 6 - 12.22) / 100);
+                $earning += $booking->expected_price * ((100 - 6 - 12.22) / 100);
             } else {
-                $earning += $booking->total_price * ((100 - 6 - 42.89) / 100);
+                $earning += $booking->expected_price * ((100 - 6 - 42.89) / 100);
             }
 
             $earning_before += $booking->invoiced;
@@ -180,7 +181,7 @@ class AdminController extends Controller
             'to' => check_number($customer_details->phone),  /* The mobile number you want to send to */
             'message' => $info['sms'],
         );
-        echo sendSMS($sms) . "\n";
+        //echo sendSMS($sms) . "\n";
 
         return redirect()->back();
 
@@ -196,22 +197,18 @@ class AdminController extends Controller
         $info['sms'] .= "Boknings-ID: " . $request->order_id . "\n";
         $info['sms'] .= "Adress: " . $customer_details->address . " \n";
         $info['sms'] .= "Datum: " . Carbon::parse($order->date)->format('d/m-y H:i') . " \n";
-        $info['sms'] .= "Pris: " . $order->total_price . " kr \n\n";
+        $info['sms'] .= "Pris: " . $order->end_price_rut + $order->end_price_non_rut . " kr \n\n";
 
         $info['sms'] .= "Arbetet på din adress är nu utfört. Hoppas att du är nöjd med resultatet. \n\n";
 
         $info['sms'] .= "Faktura kommer inom 48 timmar(helgfri vardag) skickas via " . $customer_details->billing_method . ". Hanteras av frilans finans. Får du den ej inom tiden så hör av dig snarast! \n";
         $info['sms'] .= "Vid eventuell reseersättning eller tillägg för släp så får du en separat faktura för den.";
 
-        if ($order->stop_time) {
-            $order->per_hour = round(((get_price($order->order_id)->total * 0.8 - get_price($order->order_id)->distance) * 60) / \Carbon\Carbon::parse($order->start_time)->diffInMinutes($order->stop_time));
-        }
-
-        $totalPrice = $order->end_price_total;
+        $totalPrice = $order->end_price_rut;
         $price_excl = $totalPrice / 1.25;
         $order->invoiced = $price_excl * 2;
-        $order->customer_price = $order->end_price_total;
-        $order->net_earnings = $order->end_price_total * 0.8;
+        $order->customer_price = $order->end_price_rut;
+        $order->net_earnings = $order->end_price_rut * 0.8;
 
         $order->status = 3;
         $order->save();
@@ -240,11 +237,6 @@ class AdminController extends Controller
 
         $order->status = 7;
         $order->save();
-
-        foreach ($order->services as $bookingService) {
-            $relatedService = $bookingService->service;  // Antag att detta är relationen till Service
-            $relatedService->service_options()->delete();
-        }
 
         $order->services()->delete();
         $customer_details->delete();

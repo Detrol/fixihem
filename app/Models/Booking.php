@@ -52,7 +52,7 @@ class Booking extends Model
         return $this->belongsTo(Customers::class, 'customer_id');
     }
 
-    public function getTotalPriceAttribute()
+    public function getExpectedPriceAttribute()
     {
         $price = ($this->expected_time / 60) * 299;
 
@@ -104,9 +104,7 @@ class Booking extends Model
         return max($price, 300);
     }
 
-
-
-    public function getEndPriceTotalAttribute()
+    public function getEndPriceRutAttribute()
     {
         $timePrice = $this->end_price;
         $servicePrice = 0;
@@ -123,15 +121,19 @@ class Booking extends Model
             }
 
             // Och lägg till priset av alla tjänstealternativ om de finns
-            if($service->service && $service->service_options) {
-                $selectedOptionIds = json_decode($service->service_options, true);
+            if ($service->service && $service->service_options) {
+                // Om $service->service_options redan är en array behöver vi inte dekoda den med json_decode
+                $selectedOptions = json_decode($service->service_options, true);
 
-                if($selectedOptionIds && is_array($selectedOptionIds)) {
-                    foreach ($selectedOptionIds as $selectedOptionId) {
-                        $option = $service->service->service_options->where('id', $selectedOptionId)->first();
-                        if($option) {
-                            $servicePrice += $option->price;
+                if ($selectedOptions && is_array($selectedOptions)) {
+                    foreach ($selectedOptions as $selectedOption) {
+                        // Kontrollera om tjänstealternativet har not_rut satt till 1
+                        if (isset($selectedOption['not_rut']) && $selectedOption['not_rut'] == 1) {
+                            continue; // Hoppa över detta tjänstealternativ och fortsätt med nästa i loopen
                         }
+
+                        $optionPrice = floatval($selectedOption['price']);  // Konvertera priset till en float
+                        $servicePrice += $optionPrice;
                     }
                 }
             }
@@ -160,7 +162,29 @@ class Booking extends Model
         return max($timePrice + $servicePrice, 300);
     }
 
+    public function getEndPriceNonRutAttribute()
+    {
+        $toLocationCompensation = $this->to_location_price * $this->to_location_times;
+        $toCustomerCompensation = $this->to_customer_price;
 
+        $nonRutServicePrice = 0;
+
+        foreach ($this->services as $service) {
+            if ($service->service && $service->service_options) {
+                $selectedOptions = json_decode($service->service_options, true);
+
+                if ($selectedOptions && is_array($selectedOptions)) {
+                    foreach ($selectedOptions as $selectedOption) {
+                        if (isset($selectedOption['not_rut']) && $selectedOption['not_rut'] == 1) { // Kontrollera om 'not_rut' är satt till 1
+                            $nonRutServicePrice += floatval($selectedOption['price']);
+                        }
+                    }
+                }
+            }
+        }
+
+        return $toLocationCompensation + $toCustomerCompensation + $nonRutServicePrice;
+    }
 
     public function getEndPriceAttribute()
     {
