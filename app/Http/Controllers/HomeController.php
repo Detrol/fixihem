@@ -55,7 +55,7 @@ class HomeController extends Controller
                 ->uniqueIdentifier($booking->order_id)
                 ->createdAt($booking->created_at)
                 ->startsAt(Carbon::parse($mission_date . ' ' . $mission_time))
-                ->endsAt(Carbon::parse($mission_date . ' ' . $mission_time)->addSeconds(max($booking->expected_time, 3600)))
+                ->endsAt(Carbon::parse($mission_date . ' ' . $mission_time)->addMinutes(max($booking->expected_time, 60)))
                 ->address($customer_details->address . ' ' . $customer_details->city);
 
             $entries[] = $event;
