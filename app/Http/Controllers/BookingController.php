@@ -50,7 +50,7 @@ class BookingController extends Controller
             'expected_time' => session('expected_time'),
             'price' => $price,
             'total_price' => $totalPrice,
-            'to_location_times' => session('travels'),
+            'to_location_times' => session('travels', 1),
         ], $travelData);
 
         /*$extraTimeForDrive = 60;
@@ -121,7 +121,7 @@ class BookingController extends Controller
             try {
                 //Mail::to('info@fixihem.se')->send(new Generic($mailData));
             } catch (Exception $e) {
-                // Handle the case where the email could not be sent
+                \Log::error("Kunde inte skicka mail: " . $e->getMessage());
             }
 
             session()->forget(['services', 'options', 'service_quantity', 'has_material', 'option_quantity', 'toralPrice', 'price', 'expected_time', 'serviceData', 'comments', 'travels']);
@@ -129,6 +129,7 @@ class BookingController extends Controller
             return redirect()->route('home')->with('status', 'Bokning skapad!');
         } catch (\Exception $e) {
             // Lägg till lämplig felhantering här
+            \Log::error("Något gick fel när du försökte boka: " . $e->getMessage());
             return redirect()->back()->with('error', 'Något gick fel när du försökte boka.');
         }
     }
@@ -697,24 +698,26 @@ class BookingController extends Controller
             $busy_between->add(['start' => Carbon::parse($request->date . ' ' . $specialTimes->from)->tz('Europe/Stockholm'), 'end' => Carbon::parse($request->date . ' ' . $specialTimes->to)->tz('Europe/Stockholm')]);
         }*/
 
-        try {
-            // Hämta data från andra databasen
-            $reservedTimes = DB::connection('second_db')->table('reserved_times')->where('date', Carbon::parse($request->date)->format('Y-m-d'))->first();
-            $specialTimes = DB::connection('second_db')->table('special_times')->where('date', Carbon::parse($request->date)->format('Y-m-d'))->first();
+        if(request()->getHost() == 'localhost') {
+            try {
+                // Hämta data från andra databasen
+                $reservedTimes = DB::connection('second_db')->table('reserved_times')->where('date', Carbon::parse($request->date)->format('Y-m-d'))->first();
+                $specialTimes = DB::connection('second_db')->table('special_times')->where('date', Carbon::parse($request->date)->format('Y-m-d'))->first();
 
-            // RESERVED TIMES
-            if ($reservedTimes?->from && $reservedTimes?->to) {
-                $busy_between->add(['start' => Carbon::parse($request->date . ' ' . $reservedTimes->from)->tz('Europe/Stockholm'), 'end' => Carbon::parse($request->date . ' ' . $reservedTimes->to)->tz('Europe/Stockholm')]);
-            }
+                // RESERVED TIMES
+                if ($reservedTimes?->from && $reservedTimes?->to) {
+                    $busy_between->add(['start' => Carbon::parse($request->date . ' ' . $reservedTimes->from)->tz('Europe/Stockholm'), 'end' => Carbon::parse($request->date . ' ' . $reservedTimes->to)->tz('Europe/Stockholm')]);
+                }
 
-            // SPECIAL TIMES
-            if ($specialTimes?->from && $specialTimes?->to) {
-                $busy_between->add(['start' => Carbon::parse($request->date . ' ' . $specialTimes->from)->tz('Europe/Stockholm'), 'end' => Carbon::parse($request->date . ' ' . $specialTimes->to)->tz('Europe/Stockholm')]);
+                // SPECIAL TIMES
+                if ($specialTimes?->from && $specialTimes?->to) {
+                    $busy_between->add(['start' => Carbon::parse($request->date . ' ' . $specialTimes->from)->tz('Europe/Stockholm'), 'end' => Carbon::parse($request->date . ' ' . $specialTimes->to)->tz('Europe/Stockholm')]);
+                }
+            } catch (\Exception $e) {
+                // Här hanteras eventuella fel som uppstår när du försöker ansluta till den andra databasen eller hämta data
+                // Du kan logga felet eller göra något annat beroende på ditt behov
+                \Log::error("Error connecting to second database: " . $e->getMessage());
             }
-        } catch (\Exception $e) {
-            // Här hanteras eventuella fel som uppstår när du försöker ansluta till den andra databasen eller hämta data
-            // Du kan logga felet eller göra något annat beroende på ditt behov
-            \Log::error("Error connecting to second database: " . $e->getMessage());
         }
 
 
