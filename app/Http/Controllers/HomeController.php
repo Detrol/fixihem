@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\FormMail;
 use App\Mail\Generic;
 use App\Models\Booking;
 use App\Models\Category;
@@ -129,7 +130,7 @@ class HomeController extends Controller
         }
 
         if ($request->action == 'contact_form_submit') {
-            Mail::to('info@fixihem.se')->send(new Generic($mailData));
+            Mail::to('info@fixihem.se')->send(new FormMail($mailData));
 
             return redirect()->route('home')->with('status', 'Jag har nu mottagit ditt meddelande, och jag svarar oftast inom några timmar.');
         }
