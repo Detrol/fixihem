@@ -118,21 +118,6 @@
 
                     </td>
                 </tr>
-                <tr>
-                    <td align="center" style="padding: 35px; background-color: #ffffff;" bgcolor="#ffffff">
-                        <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%"
-                               style="max-width:600px;">
-                            <tr>
-                                <td align="center">
-                                    <a href="https://putsamer.se">
-                                        <img src="{{ url('/assets/images/putsamer.png') }}" alt=""
-                                             style="display: block; border: 0px; max-height: 50px; max-width: 100px"/>
-                                    </a>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
             </table>
         </td>
     </tr>
