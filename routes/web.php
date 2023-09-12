@@ -22,6 +22,8 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/c/d289skj2', [HomeController::class, 'my_calendar']);
 
+Route::post('/form_mail', [HomeController::class, 'form_mail'])->name('form_mail');
+
 Route::group(['middleware' => ['web']], function() {
     Route::post('/steg1', [BookingController::class, 'processStep1'])->name('booking.step1');
     Route::get('/steg2', [BookingController::class, 'showStep2'])->name('booking.step2');

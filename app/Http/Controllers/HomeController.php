@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\Generic;
 use App\Models\Booking;
 use App\Models\Category;
 use App\Models\Customers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use ReflectionClass;
 use Spatie\IcalendarGenerator\Components\Calendar;
@@ -100,5 +102,39 @@ class HomeController extends Controller
 
         return response($calendar->get())
             ->header('Content-Type', 'text/calendar; charset=utf-8');
+    }
+
+    public function form_mail(Request $request)
+    {
+        $title = 'Kontaktformulär';
+
+        $request->validate([
+            'message' => 'required',
+            'email' => 'required|email',
+            'name' => 'required',
+        ]);
+
+        $subject = 'Kontaktformulär';
+
+        $mailData = [
+            "subject" => $subject,
+            'message' => $request->message,
+            'title' => $title,
+            'contact_name' => $request->name,
+            'contact_email' => $request->email,
+        ];
+
+        if ($request->norobot != '') {
+            return redirect()->route('home')->with('status', 'Något gick fel.');
+        }
+
+        if ($request->action == 'contact_form_submit') {
+            Mail::to('info@fixihem.se')->send(new Generic($mailData));
+
+            return redirect()->route('home')->with('status', 'Jag har nu mottagit ditt meddelande, och jag svarar oftast inom några timmar.');
+        }
+
+        return redirect()->route('home')->with('status', 'Något gick fel.');
+
     }
 }

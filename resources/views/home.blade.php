@@ -61,8 +61,7 @@
                 <div class="small pb-4">
                     Innan du bokar mina tjänster, vänligen beakta följande:
                     <ul class="pl-3">
-                        <li>Fakturering: Minimibelopp <strong>300 kr</strong>.</li>
-                        <li>Transport av skräp/kläder kan medföra extra kostnad. Tiden och avgiften baseras på avståndet till närmaste återvinningsstation. Detta räknas automatiskt ut i sista bokningssteget.</li>
+                        <li>Minsta fakturerade belopp: <strong>300 kr</strong>.</li>
                         <li>Jag kör en kombi för transport. Om du har mycket skräp kan ett släp hyras, välj då till Släp(nätgrind) nedan. Vänligen sortera skräp i förväg. Observera att jag inte kan hantera mycket tunga eller stora föremål på egen hand.</li>
                         <li>I nästa steg kan du lägga till en kommentar för varje vald tjänst, om du har specifika önskemål eller information att dela med dig av.</li>
                     </ul>
@@ -175,7 +174,7 @@
                              style="max-height: 4rem;">
                     </figure>
                 </a>
-                <p>Besök då min andra verksamhet!</p>
+                <p>Besök gärna min andra verksamhet!</p>
             </div>
         </div>
         <!-- End CTA -->
@@ -206,26 +205,53 @@
                     <!-- Card -->
                     <div class="card card-lg card-bordered shadow-none">
                         <div class="card-body">
-                            <form>
-                                <div class="d-grid gap-4">
-                                    <!-- Form -->
-                                    <span class="d-block">
-                                        <label class="form-label" for="blogContactsFormEmail">Din e-post</label>
-                                        <input type="email" class="form-control" name="blogContactsEmailName"
-                                               id="blogContactsFormEmail" placeholder="epost@sida.com"
-                                               aria-label="email@site.com">
-                                    </span>
-                                    <!-- End Form -->
+                            <form method="post" action="{{ route('form_mail') }}">
+                                @csrf
+                                <input type="hidden" name="action" value="contact_form_submit" tabindex="-1">
+                                <input type="text" name="norobot" value="" class="d-none" tabindex="-1">
 
-                                    <!-- Form -->
+                                <div class="d-grid gap-4">
+                                    <!-- Name Field -->
                                     <span class="d-block">
-                                        <label class="form-label" for="blogContactsFormComment">Kommentar</label>
-                                        <textarea class="form-control" id="blogContactsFormComment"
-                                                  name="blogContactsCommentName"
-                                                  placeholder="Lämna din kommentar här..."
-                                                  aria-label="Lämna din kommentar här..." rows="5"></textarea>
+                                        <label class="form-label" for="name">Namn</label>
+                                        <input type="text" class="form-control @error('name') is-invalid @enderror" name="name"
+                                               value="{{ old('name') }}"
+                                               id="name" placeholder="Svea Svensson"
+                                               aria-label="Namn" required>
+                                        @error('name')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                        @enderror
                                     </span>
-                                    <!-- End Form -->
+
+                                    <!-- Email Field -->
+                                    <span class="d-block">
+                                        <label class="form-label" for="email">Din e-post</label>
+                                        <input type="email" class="form-control @error('email') is-invalid @enderror" name="email"
+                                               value="{{ old('email') }}"
+                                               id="email" placeholder="epost@sida.com"
+                                               aria-label="Din e-post" required>
+                                        @error('email')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                        @enderror
+                                    </span>
+
+                                    <!-- Message Field -->
+                                    <span class="d-block">
+                                        <label class="form-label" for="message">Meddelande</label>
+                                        <textarea class="form-control @error('message') is-invalid @enderror" id="message"
+                                                  name="message"
+                                                  placeholder="Lämna din kommentar här..."
+                                                  aria-label="Meddelande" rows="5" required>{{ old('message') }}</textarea>
+                                        @error('message')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                        @enderror
+                                    </span>
 
                                     <div class="d-grid">
                                         <button type="submit" class="btn btn-primary">Skicka in</button>
