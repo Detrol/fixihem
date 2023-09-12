@@ -30,6 +30,6 @@ class FormMail extends Mailable
      */
     public function build()
     {
-        return $this->subject($this->mailData['subject'])->from('info@fixihem.se', 'Fixihem')->replyTo($this->mailData['contact_email'])->view('emails.generic');
+        return $this->subject($this->mailData['subject'])->from('info@fixihem.se', $this->mailData['contact_name'])->replyTo($this->mailData['contact_email'])->view('emails.generic');
     }
 }
