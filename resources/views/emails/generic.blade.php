@@ -84,7 +84,7 @@
                                 <tr>
                                     <td align="center" valign="top"
                                         style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 36px; font-weight: 800; line-height: 48px;">
-                                        <img src="{{ url('/assets/images/logo_large.png') }}" width="420px"
+                                        <img src="{{ url('/assets/img/logo_large.png') }}" width="420px"
                                              style="display: block; border: 0px;" alt="...">
                                     </td>
                                 </tr>
