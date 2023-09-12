@@ -22,6 +22,9 @@
                         Alla tjänster jag erbjuder är <strong>RUT-berättigade</strong>. Priset är
                         <strong>299 kr/timma</strong>, inklusive RUT-avdrag. Det gör det både prisvärt och enkelt för dig.
                     </p>
+                    <p>
+                        Jag utför arbete i och runt <strong>Karlstads</strong> kommun.
+                    </p>
                     <h5>Exempel på tjänster:</h5>
                     <ul class="list-unstyled">
                         <li><i class="fas fa-oven"></i> Rengöring av ugn och spis</li>
