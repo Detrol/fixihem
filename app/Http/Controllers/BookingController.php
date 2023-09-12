@@ -109,7 +109,7 @@ class BookingController extends Controller
                 'to' => check_number(request()->phone),  /* The mobile number you want to send to */
                 'message' => $info['sms'],
             );
-            //echo sendSMS($sms) . "\n";
+            echo sendSMS($sms) . "\n";
 
             $body = 'En bokning har kommit in.';
 
@@ -119,7 +119,7 @@ class BookingController extends Controller
             ];
 
             try {
-                //Mail::to('info@fixihem.se')->send(new Generic($mailData));
+                Mail::to('info@fixihem.se')->send(new Generic($mailData));
             } catch (Exception $e) {
                 \Log::error("Kunde inte skicka mail: " . $e->getMessage());
             }

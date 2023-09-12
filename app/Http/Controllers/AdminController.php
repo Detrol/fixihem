@@ -172,7 +172,7 @@ class AdminController extends Controller
         $info['sms'] .= "Din bokning har blivit bekräftad! \n\n";
         $info['sms'] .= "Boknings-ID: " . $order->order_id . " \n";
         $info['sms'] .= "Adress: " . $customer_details->address . " \n";
-        $info['sms'] .= "Datum: " . Carbon::parse($order->date)->format('d/m-y H:i') . " \n\n";
+        $info['sms'] .= "Datum: " . Carbon::parse($order->date_time)->format('d/m-y H:i') . " \n\n";
         $info['sms'] .= "Du kommer att faktureras via Frilans Finans som du kan läsa mer om här: \n";
         $info['sms'] .= "https://frilansfinans.se/fakturamottagare";
 
@@ -181,7 +181,7 @@ class AdminController extends Controller
             'to' => check_number($customer_details->phone),  /* The mobile number you want to send to */
             'message' => $info['sms'],
         );
-        //echo sendSMS($sms) . "\n";
+        echo sendSMS($sms) . "\n";
 
         return redirect()->back();
 
@@ -196,7 +196,7 @@ class AdminController extends Controller
         $info['sms'] .= "Arbete utfört \n\n";
         $info['sms'] .= "Boknings-ID: " . $request->order_id . "\n";
         $info['sms'] .= "Adress: " . $customer_details->address . " \n";
-        $info['sms'] .= "Datum: " . Carbon::parse($order->date)->format('d/m-y H:i') . " \n";
+        $info['sms'] .= "Datum: " . Carbon::parse($order->date_time)->format('d/m-y H:i') . " \n";
         $info['sms'] .= "Pris: " . $order->end_price_rut + $order->end_price_non_rut . " kr \n\n";
 
         $info['sms'] .= "Arbetet på din adress är nu utfört. Hoppas att du är nöjd med resultatet. \n\n";
@@ -232,7 +232,7 @@ class AdminController extends Controller
         $info['sms'] = null;
         $info['sms'] .= "Boknings-ID: " . $order->order_id . " \n";
         $info['sms'] .= "Adress: " . $customer_details->address . " \n";
-        $info['sms'] .= "Datum: " . Carbon::parse($order->date)->format('d/m-y H:i') . " \n\n";
+        $info['sms'] .= "Datum: " . Carbon::parse($order->date_time)->format('d/m-y H:i') . " \n\n";
         $info['sms'] .= "Din bokning har blivit makulerad, ingen vidare åtgärd krävs.";
 
         $order->status = 7;
@@ -244,10 +244,10 @@ class AdminController extends Controller
 
         $sms = array(
             'from' => 'Fixihem',   /* Can be up to 11 alphanumeric characters */
-            'to' => check_number($customer_details->telephone),  /* The mobile number you want to send to */
+            'to' => check_number($customer_details->phone),  /* The mobile number you want to send to */
             'message' => $info['sms'],
         );
-        //echo sendSMS($sms) . "\n";
+        echo sendSMS($sms) . "\n";
 
         return redirect()->back();
 
@@ -287,23 +287,7 @@ class AdminController extends Controller
 
         return view('admin.ajax.order_details', compact('order', 'customer_details'));
     }
-
-    public function order_text(Request $request)
-    {
-        $order = CustomerBookings::where('order_id', $request->order_id)->first();
-        if ($order->user_id) {
-            $customer_details = CustomerDetailsUsers::where('user_id', $order->user_id)->first();
-        } else {
-            $customer_details = CustomerDetails::where('order_id', $order->order_id)->first();
-        }
-        $get_categories_all = DataServiceCategories::where('active', 1)->get();
-        $get_u_categories_all = DataServiceUCategories::where('active', 1)->get();
-        $get_special_services = CustomerSpecialServices::where('order_id', $request->order_id)->get();
-        $worked_time = $request->worked_time;
-
-        return view('admin.ajax.order_text', compact('order', 'customer_details', 'get_categories_all', 'get_u_categories_all', 'get_special_services', 'worked_time'));
-    }
-
+    
     public function generateInvoiceText($orderId)
     {
         $order = Booking::with(['services', 'services.service', 'services.service.service_options'])

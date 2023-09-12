@@ -3,9 +3,9 @@
 @section('content')
 
     <main id="content" role="main">
-       {{--@foreach (session()->all() as $key => $value)
-            <p><strong>{{ $key }}:</strong> {{ is_array($value) ? json_encode($value) : $value }}</p>
-        @endforeach--}}
+        {{--@foreach (session()->all() as $key => $value)
+             <p><strong>{{ $key }}:</strong> {{ is_array($value) ? json_encode($value) : $value }}</p>
+         @endforeach--}}
         <!-- Card Grid -->
         <div class="container content-space-t-3">
             <div class="row justify-content-lg-between sidebar-parent">
@@ -140,12 +140,14 @@
                             <p class="text-muted small">Få påminnelse en dag i förväg</p>
 
                             <div class="form-check">
-                                <input type="checkbox" id="email_reminders" class="form-check-input" name="email_reminder" value="1">
+                                <input type="checkbox" id="email_reminders" class="form-check-input"
+                                       name="email_reminder" value="1">
                                 <label class="form-check-label" for="email_reminders">E-Post</label>
                             </div>
 
                             <div class="form-check mb-3">
-                                <input type="checkbox" id="sms_reminders" class="form-check-input" name="sms_reminder" value="1">
+                                <input type="checkbox" id="sms_reminders" class="form-check-input" name="sms_reminder"
+                                       value="1">
                                 <label class="form-check-label" for="sms_reminders">SMS</label>
                             </div>
 
@@ -227,16 +229,20 @@ föregående steg, eftersom vi räknar med tur/retur här, det gäller också pr
 
 
                     <div class="form-check mt-3" id="terms-container" style="display: none;">
-                        <input class="form-check-input" type="checkbox" value="" id="terms" required>
-                        <label class="form-check-label" for="terms">Jag accepterar de allmänna villkoren.</label>
+                        <input class="form-check-input check" type="checkbox" value="1" id="terms" required>
+                        <label class="form-check-label" for="terms">Jag accepterar de <a href="{{ route('terms') }}"
+                                                                                         target="_blank">allmänna villkoren</a>.</label>
                     </div>
                     <div class="form-check" id="privacy-container" style="display: none;">
-                        <input class="form-check-input" type="checkbox" value="" id="privacy" required>
-                        <label class="form-check-label" for="privacy">Jag accepterar sekretesspolicyn.</label>
+                        <input class="form-check-input check" type="checkbox" value="1" id="privacy" required>
+                        <label class="form-check-label" for="privacy">Jag accepterar <a href="{{ route('privacy') }}"
+                                                                                        target="_blank">sekretesspolicyn</a>.</label>
                     </div>
 
-                    <button type="submit" form="book" class="btn btn-primary mt-3" id="confirm-button"
-                            style="display: none;">Bekräfta och boka
+                    <button type="submit" form="book" class="btn btn-primary mt-3 submitButton" id="confirm-button"
+                            style="display: none;">
+                        Bekräfta och boka
+                        <i class="fa fa-check ms-1"></i>
                     </button>
 
                 </div>
@@ -251,9 +257,9 @@ föregående steg, eftersom vi räknar med tur/retur här, det gäller också pr
                                 <div class="card-body p-3">
                                     <h5 class="mb-0">{{ $service['name'] }}</h5>
                                     @if($service['price'] != 0.0)
-                                    <h6>{{ $service['quantity'] ? $service['quantity'] . ' st - ' : '' }}<span
-                                            class="text-primary">{{ $service['price'] }} kr{{ $service['quantity'] ? '/st' : '' }}</span>
-                                    </h6>
+                                        <h6>{{ $service['quantity'] ? $service['quantity'] . ' st - ' : '' }}<span
+                                                class="text-primary">{{ $service['price'] }} kr{{ $service['quantity'] ? '/st' : '' }}</span>
+                                        </h6>
                                     @endif
 
                                     @if ($service['material_price'])
@@ -336,12 +342,51 @@ föregående steg, eftersom vi räknar med tur/retur här, det gäller också pr
     </script>
 
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('[data-toggle="tooltip"]').tooltip();
         });
 
         $('#personal_number').mask('00000000-0000', {placeholder: "_________-____"});
         $('#postal_code').mask('000 00', {placeholder: "___ __"});
+
+        $("#book").submit(function (e) {
+            e.preventDefault(); // Förhindra omedelbar inskickning av formuläret
+
+            $(".submitButton").prop("disabled", true).removeClass('fa fa-check').html(
+                'Skapar bokning <i class="fa fa-circle-notch fa-spin"></i>'
+            );
+
+            setTimeout(function() {
+                $("#book").off("submit").submit(); // Ta bort eventlyssnaren och skicka in formuläret
+            }, 3000); // Fördröj med 3 sekunder (3000 millisekunder)
+        });
+
+        $('.submitButton').prop('disabled', true).prop('title', 'Kryssa i nödvändiga boxarna');
+
+        $(document).ready(function () {
+            $('.check').click(function () {
+                if (allChecked()) {
+                    $(".submitButton").prop('disabled', false).prop('title', '');
+                } else {
+                    $(".submitButton").prop('disabled', true);
+                }
+            });
+
+            $('.click').each(function () {
+                $(this).click(function () {
+                    $(this).find('i.caret').toggleClass("rotate");
+                });
+            });
+        });
+
+        function allChecked() {
+            let checkboxes = $('.check'),
+                allChecked = true;
+            checkboxes.each(function (i, e) {
+                allChecked = allChecked && $(e).is(":checked");
+            });
+            return allChecked;
+        }
 
         $('#datepicker').datepicker({
             startView: 0,
