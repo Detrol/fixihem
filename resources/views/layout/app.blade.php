@@ -95,30 +95,23 @@
             <p class="fs-5 mb-0">&copy; {{ date('Y') }} Fixihem. Alla rättigheter förbehållna.</p>
         </div>
 
-        <!--<div class="col-md d-md-flex justify-content-md-end">
-            <ul class="list-inline mb-0">
+        <div class="col-md d-md-flex justify-content-md-end">
+            <ul class="list-inline mb-0 fs-5">
+                <li class="list-inline-item">
+                    <a href="/terms">Allmänna villkor</a>
+                </li>
                 <li class="list-inline-item">
                     <a class="btn btn-icon btn-sm btn-ghost-secondary rounded-circle" href="#">
-                        <i class="bi-facebook"></i>
+                        <a href="/privacy">Integritet</a>
                     </a>
                 </li>
                 <li class="list-inline-item">
                     <a class="btn btn-icon btn-sm btn-ghost-secondary rounded-circle" href="#">
-                        <i class="bi-twitter"></i>
-                    </a>
-                </li>
-                <li class="list-inline-item">
-                    <a class="btn btn-icon btn-sm btn-ghost-secondary rounded-circle" href="#">
-                        <i class="bi-github"></i>
-                    </a>
-                </li>
-                <li class="list-inline-item">
-                    <a class="btn btn-icon btn-sm btn-ghost-secondary rounded-circle" href="#">
-                        <i class="bi-slack"></i>
+                        <a href="/cookies">Cookies</a>
                     </a>
                 </li>
             </ul>
-        </div>-->
+        </div>
     </div>
 </footer>
 <!-- ========== END FOOTER ========== -->
@@ -134,18 +127,6 @@
         </div>
     </div>
 @endif
-
-<div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="toast-header">
-        <img src="..." class="rounded me-2" alt="...">
-        <strong class="me-auto">Bootstrap</strong>
-        <small>11 mins ago</small>
-        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-    </div>
-    <div class="toast-body">
-        Hello, world! This is a toast message.
-    </div>
-</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"
         integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw=="
