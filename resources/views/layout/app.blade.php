@@ -9,7 +9,17 @@
     @if ((request()->getHost() != 'localhost'))
     <!-- Start cookieyes banner -->
     <script id="cookieyes" type="text/javascript" src="https://cdn-cookieyes.com/client_data/0b31c6d330d72ed32b2e2498/script.js"></script>
-    <!-- End cookieyes banner -->
+    <!-- End cookieyes banner -->,
+
+    <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-0D9MEZTBX8"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-0D9MEZTBX8');
+        </script>
     @endif
 
     <!-- Title -->
