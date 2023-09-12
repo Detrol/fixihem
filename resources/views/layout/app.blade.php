@@ -55,7 +55,7 @@
         <div class="navbar-nav-wrap">
             <div class="navbar-brand-wrapper">
                 <!-- Logo -->
-                <a class="navbar-brand" href="../index.html" aria-label="Unify">
+                <a class="navbar-brand" href="/" aria-label="Unify">
                     <img class="navbar-brand-logo" src="{{ asset('assets/img/logo_small.png') }}" alt="Logo">
                 </a>
                 <!-- End Logo -->

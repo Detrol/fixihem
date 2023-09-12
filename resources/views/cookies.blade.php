@@ -19,8 +19,8 @@
 
                     <h1 class="cookie-policy-h1">Cookiepolicy</h1>
                     <p>
-                        Ikraftträdande datum: 19-Mar-2022 <br>
-                        Senast uppdaterad: 19-Mar-2022
+                        Ikraftträdande datum: 12-Sep-2023 <br>
+                        Senast uppdaterad: 12-Sep-2023
                     </p>
 
                     &nbsp;
