@@ -110,14 +110,12 @@
                         <div class="card-body small p-3">
                             <h6 class="mb-0">{{ $service->service->name }} - {{ $service->quantity }} st</h6>
 
-                            @if (count($service->service->service_options) > 0)
+                            @if (!empty($service->service_options_array))
                                 <p>
-                                    <span class="fw-medium">Tillval:</span>
-                                    @if(is_array($service->service_options_array) && !empty($service->service_options_array))
-                                        @foreach($service->service_options_array as $option)
-                                            <span>{{ $option['name'] }}</span><br/>
-                                        @endforeach
-                                    @endif
+                                    <span class="fw-medium">Tillval:</span><br>
+                                    @foreach($service->service_options_array as $option)
+                                        <span>{{ $option['name'] ?? '' }} - {{ $option['quantity'] ?? 1 }} st</span><br/>
+                                    @endforeach
                                 </p>
                             @endif
 

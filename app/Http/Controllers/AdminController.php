@@ -218,7 +218,7 @@ class AdminController extends Controller
             'to' => check_number($customer_details->phone),  /* The mobile number you want to send to */
             'message' => $info['sms'],
         );
-        //sendSMS($sms);
+        sendSMS($sms);
 
         return redirect()->back();
 
@@ -282,12 +282,12 @@ class AdminController extends Controller
 
         // Modifiera tjänster med ytterligare data
         foreach ($order->services as $service) {
-            $service->service_options_array = json_decode($service->service->service_options, true);
+            $service->service_options_array = json_decode($service->service_options, true);
         }
 
         return view('admin.ajax.order_details', compact('order', 'customer_details'));
     }
-    
+
     public function generateInvoiceText($orderId)
     {
         $order = Booking::with(['services', 'services.service', 'services.service.service_options'])
@@ -298,11 +298,18 @@ class AdminController extends Controller
         $nonRutOptions = [];   // Non-RUT service options
 
         foreach ($order->services as $service) {
-            foreach ($service->service->service_options as $option) {
-                if ($option->not_rut) {
-                    $nonRutOptions[] = $option;
+            $serviceOptionsArray = json_decode($service->service_options, true);
+            if (is_array($serviceOptionsArray)) {
+                foreach ($serviceOptionsArray as $option) {
+                    if (isset($option['not_rut']) && $option['not_rut'] && !$service->has_own_materials) {
+                        $nonRutOptions[] = $option;
+                    }
                 }
             }
+        }
+
+        if ($order->to_customer_price < 100) {
+            $order->to_customer_price = 0;
         }
 
         $travelToCustomer = [
@@ -333,8 +340,8 @@ class AdminController extends Controller
             $totalNonRutAndTravel += $travelToLocation['total_price'];
         }
         foreach ($nonRutOptions as $option) {
-            $optionQuantity = $option->quantity ?? 1;
-            $totalNonRutAndTravel += $option->price * $optionQuantity;
+            $optionQuantity = $option['quantity'] ?? 1;
+            $totalNonRutAndTravel += $option['price'] * $optionQuantity;
         }
 
         $startTime = Carbon::createFromFormat('H:i:s', $order->start_time);

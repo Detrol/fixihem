@@ -51,7 +51,7 @@
     Pris: {{ number_format($totalNonRutAndTravel) }} kr<br>
     Faktureras via: {{ $order->customer->billing_method }}<br><br>
 
-    @if ($travelToCustomer['distance'])
+    @if ($travelToCustomer['distance'] && $travelToCustomer['price'] > 0)
     # Reseersättning till kund<br>
     Avstånd: {{ $travelToCustomer['distance'] }} km<br>
     Tid: {{ $travelToCustomer['time'] }} min<br>
@@ -69,11 +69,16 @@
         @endif
     @endif
 
-    @foreach ($nonRutOptions as $option)
-        {{ $option->name }} {{ $option->price != 0 ? '- ' . $option->price . ' kr' : '' }}<br><br>
-    @endforeach
+    @if ($nonRutOptions)
+    # Materialkostnader<br>
+        @foreach ($nonRutOptions as $option)
+            {{ $option['name'] }} ({{ $option['quantity'] ?? 1 }} st á {{ $option['price'] }} kr) - Totalt: {{ ($option['quantity'] ?? 1) * $option['price'] }} kr<br>
+        @endforeach
+    @endif
 
-    Avser reseersättning för tidigare fakturerat uppdrag med ovan Boknings-ID.<br><br>
+    <br>
+
+    Avser icke RUT-tjänster för tidigare fakturerat uppdrag med ovan Boknings-ID.<br><br>
 
     -----------------------------------<br>
     <strong>Totalt belopp:</strong> {{ number_format($totalNonRutAndTravel) }} kr<br>

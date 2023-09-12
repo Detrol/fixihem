@@ -122,6 +122,10 @@ class Booking extends Model
 
             // Och lägg till priset av alla tjänstealternativ om de finns
             if ($service->service && $service->service_options) {
+                if ($service->has_own_materials) {
+                    continue;
+                }
+
                 // Om $service->service_options redan är en array behöver vi inte dekoda den med json_decode
                 $selectedOptions = json_decode($service->service_options, true);
 
@@ -132,7 +136,7 @@ class Booking extends Model
                             continue; // Hoppa över detta tjänstealternativ och fortsätt med nästa i loopen
                         }
 
-                        $optionPrice = floatval($selectedOption['price']);  // Konvertera priset till en float
+                        $optionPrice = floatval($selectedOption['price']) * ($selectedOption['quantity'] ?? 1);  // Multiplicera priset med kvantiteten, med en standardkvantitet av 1 om ingen kvantitet angiven
                         $servicePrice += $optionPrice;
                     }
                 }
@@ -165,18 +169,22 @@ class Booking extends Model
     public function getEndPriceNonRutAttribute()
     {
         $toLocationCompensation = $this->to_location_price * $this->to_location_times;
-        $toCustomerCompensation = $this->to_customer_price;
+        $toCustomerCompensation = ($this->to_customer_price < 100) ? 0 : $this->to_customer_price;
 
         $nonRutServicePrice = 0;
 
         foreach ($this->services as $service) {
+            if ($service->has_own_materials) {
+                continue;
+            }
             if ($service->service && $service->service_options) {
                 $selectedOptions = json_decode($service->service_options, true);
 
                 if ($selectedOptions && is_array($selectedOptions)) {
                     foreach ($selectedOptions as $selectedOption) {
-                        if (isset($selectedOption['not_rut']) && $selectedOption['not_rut'] == 1) { // Kontrollera om 'not_rut' är satt till 1
-                            $nonRutServicePrice += floatval($selectedOption['price']);
+                        if (isset($selectedOption['not_rut']) && $selectedOption['not_rut'] == 1) {
+                            // Multiplicera priset med kvantiteten. Använd 1 som standardkvantitet om den inte anges.
+                            $nonRutServicePrice += floatval($selectedOption['price']) * ($selectedOption['quantity'] ?? 1);
                         }
                     }
                 }
