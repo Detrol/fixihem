@@ -3,9 +3,9 @@
 @section('content')
 
     <main id="content" role="main">
-       @foreach (session()->all() as $key => $value)
+       {{--@foreach (session()->all() as $key => $value)
             <p><strong>{{ $key }}:</strong> {{ is_array($value) ? json_encode($value) : $value }}</p>
-        @endforeach
+        @endforeach--}}
         <!-- Card Grid -->
         <div class="container content-space-t-3">
             <div class="row justify-content-lg-between sidebar-parent">
@@ -122,7 +122,7 @@
 
                                 <!-- Fakturametod -->
                                 <div class="col-12 mt-3 form-group">
-                                    <p>Fakturametod:</p>
+                                    <p class="lead">Fakturametod:</p>
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" name="billing_method" id="sms"
                                                value="SMS" required checked>
@@ -135,6 +135,20 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <h6 class="lead m-0">Påminnelser</h6>
+                            <p class="text-muted small">Få påminnelse en dag i förväg</p>
+
+                            <div class="form-check">
+                                <input type="checkbox" id="email_reminders" class="form-check-input" name="email_reminder" value="1">
+                                <label class="form-check-label" for="email_reminders">E-Post</label>
+                            </div>
+
+                            <div class="form-check mb-3">
+                                <input type="checkbox" id="sms_reminders" class="form-check-input" name="sms_reminder" value="1">
+                                <label class="form-check-label" for="sms_reminders">SMS</label>
+                            </div>
+
                         </div>
 
                     </form>
@@ -205,6 +219,7 @@ föregående steg, eftersom vi räknar med tur/retur här, det gäller också pr
                                 <li>Priserna ovan är endast lösa uppskattningar och kan variera beroende på olika faktorer. Det slutgiltiga priset kan påverkas av olika omständigheter som uppstår under arbetets gång.</li>
                                 <li>Min taxa är 299 kr/timme (inklusive RUT), räknat från det att jag anländer till platsen tills arbetet är avslutat.</li>
                                 <li>Reseersättning och hyrning av släp kan inte faktureras tillsammans med RUT. Därför kommer du att få en separat faktura för dessa.</li>
+                                <li>Betalningsvillkor är 7 dagar.</li>
                             </ul>
                         </div>
 

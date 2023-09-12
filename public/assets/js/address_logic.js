@@ -1,11 +1,8 @@
 let token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 let initialTotalPrice = parseFloat(document.getElementById('price-container').getAttribute('data-total-price')) || 300;
-console.log("Initial value of initialTotalPrice:", initialTotalPrice);
 let serviceTypeForDriveLocation;
 const numberOfTrips = parseInt(document.getElementById('numberOfTrips').getAttribute('data-travels')) || 1;
 const getById = id => document.getElementById(id);
-
-console.log("Initial Total Price:", initialTotalPrice);
 
 $(document).ready(function() {
     let driveLocationData = JSON.parse(document.getElementById('serviceDriveLocationData').textContent);
@@ -40,15 +37,19 @@ $(document).ready(function() {
 function calculateTotalPrice() {
     // Summa av de olika delpriserna
     const driveToRecyclingCost = parseFloat(getById('recycling-price').textContent) || 0;
-    const driveToYouCost = parseFloat(getById('travel-price').textContent) || 0;
+    let driveToYouCost = parseFloat(getById('travel-price').textContent) || 0;
+
+    // Om reseersättning till kund är under 100 kr så ska det vara 0.
+    driveToYouCost = driveToYouCost < 100 ? 0 : driveToYouCost;
+
     const timeCost = parseFloat(getById('time-price').textContent) || 0;
 
-    console.log("driveToRecyclingCost:", driveToRecyclingCost);
-    console.log("driveToYouCost:", driveToYouCost);
-    console.log("timeCost:", timeCost);
-
-    return initialTotalPrice + driveToRecyclingCost + driveToYouCost + timeCost;
+    return {
+        totalPrice: initialTotalPrice + driveToRecyclingCost + driveToYouCost + timeCost,
+        driveToYouCost: driveToYouCost
+    };
 }
+
 
 function calculateDriveCost(distance, duration, serviceType) {
     const drivePricePerKm = 10;
@@ -67,25 +68,14 @@ function calculateDriveCost(distance, duration, serviceType) {
 }
 
 function updateTotalPrice(driveCost, timeCost) {
-    console.log("Before update:", initialTotalPrice);
-    console.log("Drive Cost:", driveCost);
-    console.log("Time Cost:", timeCost);
-
     initialTotalPrice += (driveCost + timeCost) * numberOfTrips;
-
-    console.log("After update:", initialTotalPrice);
 }
 
 function updateTimeCost(duration) {
-    console.log("updateTimeCost called with duration:", duration);
-
     const timeCostPerHour = 299;
     const timeCost = (duration/60) * timeCostPerHour;
-    console.log("Time cost in updateTimeCost:", timeCost);
 
     initialTotalPrice += timeCost * numberOfTrips;
-    console.log("After updateTimeCost, total price:", initialTotalPrice);
-
 }
 
 function updateDriveLocationUI(data) {
@@ -214,10 +204,11 @@ function updateAddressUI(data, serviceTypeForDriveLocation) {
             .then(finalData => {
                 updateAddressUI(finalData, serviceTypeForDriveLocation);
 
-                // Nu när all information har samlats och UI uppdaterats, beräknar vi totalpriset
-                const totalPrice = calculateTotalPrice();
-                getById('preliminary-price').textContent = totalPrice.toFixed(2) + " kr";
+                const calculatedPrices = calculateTotalPrice();
+                getById('preliminary-price').textContent = calculatedPrices.totalPrice.toFixed(2) + " kr";
+                getById('travel-price').textContent = calculatedPrices.driveToYouCost.toFixed(2);
             })
+
             .catch(error => {
                 console.error('Error:', error);
                 alert("Något gick fel när vi försökte hämta avståndsinformationen. Försök igen.");

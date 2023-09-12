@@ -19,7 +19,8 @@
                         Varje detalj räknas.
                     </p>
                     <p>
-                        Alla tjänster jag erbjuder är <strong>RUT-berättigade</strong>. Priset är <strong>299 kr/timma</strong>, inklusive RUT-avdrag. Det gör det både prisvärt och enkelt för dig.
+                        Alla tjänster jag erbjuder är <strong>RUT-berättigade</strong>. Priset är
+                        <strong>299 kr/timma</strong>, inklusive RUT-avdrag. Det gör det både prisvärt och enkelt för dig.
                     </p>
                     <h5>Exempel på tjänster:</h5>
                     <ul class="list-unstyled">
@@ -50,7 +51,6 @@
             <!-- End Row -->
         </div>
         <!-- End Hero -->
-
 
 
         <!-- Features -->
@@ -90,7 +90,8 @@
 
 
                                             <span class="form-check-label">
-                                                <span class="fw-medium service-name" data-service-id="{{ $service->id }}">{{ $service->name }}</span>
+                                                <span class="fw-medium service-name"
+                                                      data-service-id="{{ $service->id }}">{{ $service->name }}</span>
                                                 <span
                                                     class="d-block fs-6 text-muted">{{ $service->description }}</span>
                                                 {{--@if($service->is_rut)
@@ -107,7 +108,8 @@
                                                     @foreach($service->service_options as $option)
                                                         <div class="form-check" style="z-index: 2;">
                                                             <input type="checkbox" id="option{{ $option->id }}"
-                                                                   class="form-check-input {{ $option->is_required ? 'required-option' : '' }}" name="options[]"
+                                                                   class="form-check-input {{ $option->is_required ? 'required-option' : '' }}"
+                                                                   name="options[]"
                                                                    data-price="{{ $option->price ?? 0 }}"
                                                                    data-estimated-minutes="{{ $option->estimated_minutes }}"
                                                                    data-has-quantity="{{ $option->has_quantity }}"
@@ -165,12 +167,15 @@
 
         <!-- CTA -->
         <div class="content-space-1 bg-light">
-            <div class="w-lg-75 text-center mx-lg-auto">
+            <div class="w-lg-75 text-center mx-lg-auto px-4">
                 <h3 class="mb-4">Är du intresserad av fönsterputs?</h3>
-                <figure class="mb-4">
-                    <img class="img-fluid" src="{{ asset('assets/img/putsikarlstad.png') }}" alt="Image Description" style="height: 4rem;">
-                </figure>
-                <a class="link link-pointer" href="https://putsikarlstad.se" target="_blank">Klicka här för att besöka min andra verksamhet!</a>
+                <a class="" href="https://putsikarlstad.se" target="_blank">
+                    <figure class="mb-4">
+                        <img class="img-fluid" src="{{ asset('assets/img/putsikarlstad.png') }}" alt="Image Description"
+                             style="max-height: 4rem;">
+                    </figure>
+                </a>
+                <p>Besök då min andra verksamhet!</p>
             </div>
         </div>
         <!-- End CTA -->
@@ -185,16 +190,13 @@
         </div>-->
 
 
-
-
         <!-- Post a Comment -->
         <div class="container content-space-1">
             <!-- Heading -->
             <div class="w-lg-65 text-center mx-lg-auto mb-7">
-                <h3>Saknar du någon tjänst?</h3>
+                <h3>Vill du kontakta mig?</h3>
                 <p>
-                    Ser du inte den tjänsten du önskar hjälp med i listan?
-                    Skicka in något du önskar att jag kan hjälpa till med, så kanske det hamnar i listan ovan.
+                    Använd formuläret nedan för att kontakta mig. Om det finns någon tjänst du saknar, låt mig veta så kanske den kan läggas till i listan.
                 </p>
             </div>
             <!-- End Heading -->
@@ -210,7 +212,7 @@
                                     <span class="d-block">
                                         <label class="form-label" for="blogContactsFormEmail">Din e-post</label>
                                         <input type="email" class="form-control" name="blogContactsEmailName"
-                                               id="blogContactsFormEmail" placeholder="email@site.com"
+                                               id="blogContactsFormEmail" placeholder="epost@sida.com"
                                                aria-label="email@site.com">
                                     </span>
                                     <!-- End Form -->
@@ -255,8 +257,8 @@
 @push('js')
     <script src="/assets/js/home.js"></script>
     <script>
-        $(document).ready(function() {
-            $('.service-wrapper').on('click', function(event) {
+        $(document).ready(function () {
+            $('.service-wrapper').on('click', function (event) {
                 const checkbox = $(this).find('.service-checkbox');
 
                 // Om klick-eventet kom från kryssrutan själv eller från tjänstens namn, låt det passera igenom normalt

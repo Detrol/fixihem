@@ -108,7 +108,7 @@
 <!-- ========== END FOOTER ========== -->
 
 @if (session()->has('status'))
-    <div id="toast" class="toast shadow" role="alert" aria-live="assertive" aria-atomic="true" data-delay="5000" style="z-index: 9999999">
+    <div id="toast" class="toast shadow" role="alert" aria-live="assertive" aria-atomic="true" data-delay="10000" style="z-index: 9999999">
         <div class="toast-header bg-gradient-light text-gray-800">
             <span class="me-auto"><i class="fas fa-info-circle"></i> Meddelande</span>
             <i type="button" class="fa-solid fa-times" data-bs-dismiss="toast" aria-label="Close"></i>

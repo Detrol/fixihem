@@ -126,7 +126,7 @@ class BookingController extends Controller
 
             session()->forget(['services', 'options', 'service_quantity', 'has_material', 'option_quantity', 'toralPrice', 'price', 'expected_time', 'serviceData', 'comments', 'travels']);
 
-            return redirect()->route('home')->with('status', 'Bokning skapad!');
+            return redirect()->route('home')->with('status', 'Din bokning har skapats! Du kommer få ett bekräftelse sms när den setts över.');
         } catch (\Exception $e) {
             // Lägg till lämplig felhantering här
             \Log::error("Något gick fel när du försökte boka: " . $e->getMessage());

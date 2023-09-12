@@ -33,7 +33,29 @@ class HomeController extends Controller
     {
         $categories = Category::with('services', 'services.service_options')->where('active', 1)->get();
 
-        session()->forget(['services', 'options', 'service_quantity', 'has_material', 'option_quantity', 'toralPrice', 'price', 'expected_time', 'expectedTime', 'serviceData', 'comments', 'travels']);
+        session()->forget([
+            'services',
+            'options',
+            'service_quantity',
+            'has_material',
+            'option_quantity',
+            'toralPrice',
+            'price',
+            'expected_time',
+            'expectedTime',
+            'serviceData',
+            'comments',
+            'travels',
+            'address',
+            'city',
+            'postal_code',
+            'travel_distance',
+            'travel_duration',
+            'travel_price',
+            'location_distance',
+            'location_duration',
+            'location_price'
+        ]);
 
         return view('home', compact('categories'));
     }
