@@ -25,7 +25,7 @@
                        rätt till integritet. Om du har några frågor eller oro om detta integritetsmeddelande eller vår
                        praxis när det gäller din personliga information, vänligen kontakta oss på info@fixihem.se.<br/><br/>
 
-                       När du besöker vår webbplats https://putsikarlstad.se ("Webbplatsen"), och mer generellt, använder
+                       När du besöker vår webbplats https://fixihem.se ("Webbplatsen"), och mer generellt, använder
                        någon av våra tjänster ("Tjänsterna", som inkluderar webbplatsen), uppskattar vi att du litar på oss
                        med din personliga information. Vi tar din integritet mycket stort allvar. I detta
                        integritetsmeddelande försöker vi förklara för dig på ett så tydligt sätt som möjligt vilken
@@ -119,7 +119,7 @@
                         <li>
                             För att publicera rekommendationer. Vi publicerar rekommendationer på vår webbplats som kan innehålla personlig information.
                             Vi använder de rekommendationer som publicerats på vår Facebook-sida. Om du vill ta bort din rekommendation, vänligen kontakta oss på
-                            info@putsikarlstad.se och se till att ta med ditt namn, rekommendation plats och kontaktinformation.
+                            info@fixihem.se och se till att ta med ditt namn, rekommendation plats och kontaktinformation.
                         </li>
                         <li>
                             Begär feedback. Vi kan använda din information för att begära feedback och för att kontakta dig om din
@@ -380,7 +380,7 @@
                        information från användare under 18 år har samlats in, kommer vi att inaktivera kontot
                        och vidta rimliga åtgärder för att snabbt radera sådan information från våra poster. Om du blir medveten om
                        information vi kan ha samlat in från barn under 18 år, vänligen kontakta oss på
-                       info@putsikarlstad.se.</p>
+                       info@fixihem.se.</p>
 
                     <h4>VAD ÄR DINA INTIGRITETSRÄTTIGHETER?</h4>
 
