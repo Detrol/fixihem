@@ -6,6 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    <!-- Start cookieyes banner -->
+    <script id="cookieyes" type="text/javascript" src="https://cdn-cookieyes.com/client_data/0b31c6d330d72ed32b2e2498/script.js"></script>
+    <!-- End cookieyes banner -->
+
     <!-- Title -->
     <title>Fixihem</title>
 
