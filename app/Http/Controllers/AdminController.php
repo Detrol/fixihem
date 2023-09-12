@@ -197,7 +197,7 @@ class AdminController extends Controller
         $info['sms'] .= "Boknings-ID: " . $request->order_id . "\n";
         $info['sms'] .= "Adress: " . $customer_details->address . " \n";
         $info['sms'] .= "Datum: " . Carbon::parse($order->date_time)->format('d/m-y H:i') . " \n";
-        $info['sms'] .= "Pris: " . $order->end_price_rut + $order->end_price_non_rut . " kr \n\n";
+        $info['sms'] .= "Pris: " . number_format($order->end_price_rut + $order->end_price_non_rut) . " kr \n\n";
 
         $info['sms'] .= "Arbetet på din adress är nu utfört. Hoppas att du är nöjd med resultatet. \n\n";
 
