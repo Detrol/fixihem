@@ -121,7 +121,7 @@
                                 </div>
 
                                 <!-- Fakturametod -->
-                                <div class="col-12 mt-3 mb-3 form-group">
+                                <div class="col-12 mt-3 form-group">
                                     <p class="lead">Fakturametod:</p>
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" name="billing_method" id="sms"
