@@ -167,20 +167,30 @@
             </div>
         </div>
 
-        <!-- CTA -->
-        <div class="content-space-1 bg-light">
-            <div class="w-lg-75 text-center mx-lg-auto px-4">
-                <h3 class="mb-4">Är du intresserad av fönsterputs?</h3>
-                <a class="" href="https://putsikarlstad.se" target="_blank">
-                    <figure class="mb-4">
-                        <img class="img-fluid" src="{{ asset('assets/img/putsikarlstad.png') }}" alt="Image Description"
-                             style="max-height: 4rem;">
-                    </figure>
-                </a>
-                <p>Besök gärna min andra verksamhet!</p>
+        <section class="py-lg-10">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12 col-12">
+                        <div class="bg-light px-xl-0 rounded-4 text-dark">
+                            <div class="row align-items-center">
+                                <div class="col-xl-6 col-md-6 col-12 p-6">
+                                    <div>
+                                        <h2 class="mb-3">Är du intresserad av fönsterputs?</h2>
+                                        <p class="fs-4">Besök gärna min andra verksamhet som jag kör parallelt med denna!</p>
+                                        <a href="https://putsikarlstad.se" target="_blank" class="btn btn-dark">Besök här</a>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-md-6 col-12 px-6 pe-lg-10 pb-6 pb-lg-0">
+                                    <div class="text-center">
+                                        <img src="{{ asset('assets/img/putsikarlstad.png') }}" alt="learning" class="img-fluid">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-        <!-- End CTA -->
+        </section>
 
         <!--<div id="stickyPopup" class="sticky-popup bg-dark text-white rounded align-items-center justify-content-center">
             <span id="rutText" class="me-2"></span>
