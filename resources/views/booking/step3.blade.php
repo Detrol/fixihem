@@ -127,13 +127,13 @@
                                         <input class="form-check-input" type="radio" name="billing_method" id="sms"
                                                value="SMS" required checked>
                                         <label class="form-check-label" for="sms">SMS</label>
-                                        <small class="text-muted">Du kommer få ett SMS med en länk som startar en Swish-betalning.</small>
+                                        <div class="text-muted small">Du kommer få ett SMS med en länk som startar en Swish-betalning.</div>
                                     </div>
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" name="billing_method"
                                                id="email-billing" value="E-Post" required>
                                         <label class="form-check-label" for="email-billing">E-Post</label>
-                                        <small class="text-muted">Du får en faktura skickad till din mail i form av en fil.</small>
+                                        <div class="text-muted small">Du får en faktura skickad till din mail i form av en fil.</div>
                                     </div>
                                 </div>
                             </div>
