@@ -134,11 +134,6 @@
                                         <label class="form-check-label" for="email-billing">E-Post</label>
                                     </div>
                                 </div>
-
-                                <div class="mb-3">
-                                    <p class="lead">Valfri kommentar</p>
-                                    <textarea id="comment" class="form-control" name="comment" placeholder="Kommentar" rows="4"></textarea>
-                                </div>
                             </div>
 
                             <h6 class="lead m-0">Påminnelser</h6>
@@ -154,6 +149,11 @@
                                 <input type="checkbox" id="sms_reminders" class="form-check-input" name="sms_reminder"
                                        value="1">
                                 <label class="form-check-label" for="sms_reminders">SMS</label>
+                            </div>
+
+                            <div class="mb-3">
+                                <p class="lead">Valfri kommentar</p>
+                                <textarea id="comment" class="form-control" name="comment" placeholder="Kommentar" rows="4"></textarea>
                             </div>
 
                         </div>
