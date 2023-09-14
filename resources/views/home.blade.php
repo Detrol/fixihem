@@ -20,7 +20,7 @@
                     </p>
                     <p>
                         Alla tjänster jag erbjuder är <strong>RUT-berättigade</strong>. Priset är
-                        <strong>299 kr/timma</strong>, inklusive RUT-avdrag. Det gör det både prisvärt och enkelt för dig.
+                        <strong>249 kr/timma</strong>, inklusive RUT-avdrag. Det gör det både prisvärt och enkelt för dig.
                     </p>
                     <p>
                         Jag utför arbete i och runt <strong>Karlstads</strong> kommun.

@@ -203,7 +203,7 @@ class BookingController extends Controller
         $servicePriceWithoutTravel = $this->computeTotalServicePrice($rutPrice, $rotPrice, $nonRotRutPrice);
 
         // Nu räknar vi ut en del av totalPrice baserat på totalDuration
-        $totalPrice += ($totalDuration / 60) * 299;
+        $totalPrice += ($totalDuration / 60) * 249;
 
         if ($totalPrice < 300) {
             $totalPrice = 300;

@@ -57,7 +57,7 @@ function calculateDriveCost(distance, duration, serviceType) {
 
     let timeCost = 0;
     if (serviceType === 'recycling' && duration !== undefined) {
-        const driveTimeCostPerHour = 299;
+        const driveTimeCostPerHour = 249;
         timeCost = (duration/60) * driveTimeCostPerHour;
     }
 
@@ -72,7 +72,7 @@ function updateTotalPrice(driveCost, timeCost) {
 }
 
 function updateTimeCost(duration) {
-    const timeCostPerHour = 299;
+    const timeCostPerHour = 249;
     const timeCost = (duration/60) * timeCostPerHour;
 
     initialTotalPrice += timeCost * numberOfTrips;
@@ -123,7 +123,7 @@ function updateDriveLocationUI(data) {
 
     return {
         driveLocationTotalPrice: driveLocationTotalPrice,
-        timeCostForRecycling: (data.duration/60) * 299 * numberOfTrips * 2
+        timeCostForRecycling: (data.duration/60) * 249 * numberOfTrips * 2
     };
 }
 

@@ -54,7 +54,7 @@ class Booking extends Model
 
     public function getExpectedPriceAttribute()
     {
-        $price = ($this->expected_time / 60) * 299;
+        $price = ($this->expected_time / 60) * 249;
 
         foreach ($this->services as $service) {
             // Om kunden har sitt eget material, hoppa över denna tjänst i prisberäkningen
@@ -201,7 +201,7 @@ class Booking extends Model
 
         $durationInMinutes = $endTime->diffInMinutes($startTime);
 
-        return max(($durationInMinutes / 60) * 299, 300);
+        return max(($durationInMinutes / 60) * 249, 300);
     }
 
 }

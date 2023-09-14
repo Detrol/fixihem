@@ -226,7 +226,7 @@ föregående steg, eftersom vi räknar med tur/retur här, det gäller också pr
                             <strong>Observera:</strong>
                             <ul class="mt-2 mb-0 pl-1 text-dark">
                                 <li>Priserna ovan är endast lösa uppskattningar baserat på tiden och kan variera beroende på olika faktorer. Det slutgiltiga priset kan påverkas av olika omständigheter som uppstår under arbetets gång.</li>
-                                <li>Min taxa är 299 kr/timme (inklusive RUT), räknat från det att jag anländer till det att jag lämnar platsen.</li>
+                                <li>Min taxa är 249 kr/timme (inklusive RUT), räknat från det att jag anländer till det att jag lämnar platsen.</li>
                                 <li>Reseersättning och eventuell hyrning av släp kan inte faktureras tillsammans med RUT. Därför kommer du att få en separat faktura för dessa.</li>
                                 <li>Betalningsvillkor är 7 dagar.</li>
                             </ul>
