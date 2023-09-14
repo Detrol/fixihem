@@ -101,7 +101,7 @@ class Booking extends Model
             $price -= ($this->deduction_percent / 100) * $price;
         }
 
-        return max($price, 300);
+        return max($price, 200);
     }
 
     public function getEndPriceRutAttribute()
@@ -163,7 +163,7 @@ class Booking extends Model
             $servicePrice -= ($this->deduction_percent / 100) * $servicePrice;
         }
 
-        return max($timePrice + $servicePrice, 300);
+        return max($timePrice + $servicePrice, 200);
     }
 
     public function getEndPriceNonRutAttribute()
@@ -201,7 +201,7 @@ class Booking extends Model
 
         $durationInMinutes = $endTime->diffInMinutes($startTime);
 
-        return max(($durationInMinutes / 60) * 249, 300);
+        return max(($durationInMinutes / 60) * 249, 200);
     }
 
 }

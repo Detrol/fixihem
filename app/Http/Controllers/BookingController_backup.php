@@ -178,7 +178,7 @@ class BookingController extends Controller
         // Totalpriset för tjänsterna (utan resetillägg)
         $servicePriceWithoutTravel = $this->computeTotalServicePrice($rutPrice, $rotPrice, $nonRotRutPrice);
 
-        $approximatePrice = ($totalDuration / 60) * 300;  // Beräkna det ungefärliga priset
+        $approximatePrice = ($totalDuration / 60) * 200;  // Beräkna det ungefärliga priset
 
         session(['approximatePrice' => $approximatePrice]);  // Spara det i sessionen för framtida referens
         session(['price' => $servicePriceWithoutTravel]);
@@ -244,8 +244,8 @@ class BookingController extends Controller
     private function computeTotalServicePrice($rut, $rot, $nonRotRut)
     {
         $total = $rut + $rot + $nonRotRut;
-        if ($total < 300) {
-            $total = 300;
+        if ($total < 200) {
+            $total = 200;
         }
         return $total;
     }

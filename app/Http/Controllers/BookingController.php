@@ -205,8 +205,8 @@ class BookingController extends Controller
         // Nu räknar vi ut en del av totalPrice baserat på totalDuration
         $totalPrice += ($totalDuration / 60) * 249;
 
-        if ($totalPrice < 300) {
-            $totalPrice = 300;
+        if ($totalPrice < 200) {
+            $totalPrice = 200;
         }
 
         session(['totalPrice' => $totalPrice]);
@@ -274,8 +274,8 @@ class BookingController extends Controller
     private function computeTotalServicePrice($rut, $rot, $nonRotRut)
     {
         $total = $rut + $rot + $nonRotRut;
-        if ($total < 300) {
-            $total = 300;
+        if ($total < 200) {
+            $total = 200;
         }
         return $total;
     }

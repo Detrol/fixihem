@@ -58,8 +58,8 @@ $(document).ready(function() {
             totalPrice += individualPrice;
         });
 
-        if (totalPrice < 300) {
-            totalPrice = 300;
+        if (totalPrice < 200) {
+            totalPrice = 200;
         }
 
         animatePriceChange($('#totalPrice').data('current-price') || 0, totalPrice);
