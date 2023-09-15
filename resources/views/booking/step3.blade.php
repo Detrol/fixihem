@@ -113,7 +113,7 @@
                                 <!-- Telefonnummer & Portkod -->
                                 <div class="col-md-6 form-group">
                                     <label for="phone">Telefonnummer</label>
-                                    <input type="tel" id="phone" name="phone" class="form-control" required>
+                                    <input type="number" id="phone" name="phone" class="form-control" required>
                                 </div>
                                 <div class="col-md-6 form-group">
                                     <label for="door_code">Portkod</label>
