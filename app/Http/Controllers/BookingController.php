@@ -636,7 +636,7 @@ class BookingController extends Controller
         $start = Carbon::parse($request->date . ' 09:00')->tz('Europe/Stockholm');
         $end = Carbon::parse($request->date . ' 16:00')->tz('Europe/Stockholm');
 
-        $add_minutes = ($current_travel_time * 2) + 15;
+        $add_minutes = ($current_travel_time * 2) + 30;
 
         if (!isset($current_mission->expected_time)) {
             $current_mission_end_from_now = Carbon::now()->addMinutes(max(session('expected_time'), 60))->addMinutes($add_minutes)->tz('Europe/Stockholm');
@@ -666,7 +666,7 @@ class BookingController extends Controller
 
             $mission_travel_time = roundUpToAny($mission_travel_time);
 
-            $sub_minutes = $mission_travel_time + 15;
+            $sub_minutes = $mission_travel_time + 30;
 
             $date = $mission->date_time ?? $mission->date;
 
@@ -675,7 +675,7 @@ class BookingController extends Controller
                 $mission_start = $start;
             }
 
-            $add_minutes = $mission_travel_time + 15;
+            $add_minutes = $mission_travel_time + 30;
 
             if ($db) {
                 $mission_end = Carbon::parse($date)->addSeconds(max($mission->expected_time, 3600))->addMinutes($add_minutes)->tz('Europe/Stockholm');
