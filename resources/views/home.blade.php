@@ -67,6 +67,7 @@
                         <li>Minsta fakturerade belopp: <strong>200 kr</strong>.</li>
                         <li>Jag kör en kombi för transport. Om du har mycket skräp kan ett släp hyras, välj då till Släp(nätgrind) nedan. Vänligen sortera skräp i förväg. Observera att jag inte kan hantera mycket tunga eller stora föremål på egen hand.</li>
                         <li>I nästa steg kan du lägga till en kommentar för varje vald tjänst, om du har specifika önskemål eller information att dela med dig av.</li>
+                        <li>Reseersättning på 5 kr/km (tur/retur) tillkommer om det totala beloppet för reseersättning överstiger 100 kr.</li>
                     </ul>
                 </div>
 
