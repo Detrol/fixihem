@@ -208,7 +208,8 @@
             <div class="w-lg-65 text-center mx-lg-auto mb-7">
                 <h3>Vill du kontakta mig?</h3>
                 <p>
-                    Använd formuläret nedan för att kontakta mig. Om det finns någon tjänst du saknar, låt mig veta så kanske den kan läggas till i listan.
+                    Använd formuläret nedan för att kontakta mig. Saknar du någon tjänst eller behöver hjälp med något särskilt?
+                    Hör av dig, så ser vi om jag kan vara till hjälp.
                 </p>
             </div>
             <!-- End Heading -->
