@@ -366,7 +366,7 @@ class BookingController extends Controller
         session([
             'location_distance' => $distanceInKilometers,
             'location_duration' => $durationInMinutes,
-            'location_price' => $price
+            'location_price' => $price,
         ]);
 
         return response()->json([

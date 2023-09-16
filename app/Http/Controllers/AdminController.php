@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\Generic;
 use App\Models\Booking;
 use App\Models\BookingService;
 use App\Models\Category;
@@ -12,7 +13,10 @@ use Carbon\Carbon;
 use Carbon\CarbonInterval;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class AdminController extends Controller
 {
@@ -45,6 +49,256 @@ class AdminController extends Controller
     {
         Auth::logout();
         return redirect('/admin/login');
+    }
+
+    public function special()
+    {
+        $total_minutes = session('expected_time', 0); // hämta från sessionen, om inte finns använd 0
+
+        $hours = intdiv($total_minutes, 60); // hämta antal timmar
+        $minutes = $total_minutes % 60; // hämta resterande minuter
+
+        $categories = Category::with('services', 'services.service_options')->where('active', 1)->get();
+
+        return view('admin.special', compact('hours', 'minutes', 'categories'));
+    }
+
+    public function specialPost(Request $request)
+    {
+        // Bokningsdata direkt från requesten
+        $bookingData = $request->only(['comment', 'email_reminder', 'sms_reminder']);
+
+        // Resedata
+        $travelData = [
+            'to_customer_distance' => session('travel_distance'),
+            'to_customer_time' => round(session('travel_duration')),
+            'to_customer_price' => session('travel_distance') * 10,
+            'to_location_distance' => session('location_distance'),
+            'to_location_time' => round(session('location_duration')),
+            'to_location_price' => session('location_distance') * 10,
+        ];
+
+        // Datum och tid
+        $dateTime = $request->input('date') . ' ' . $request->input('time');
+
+        // Prisinformation
+        $price = session('price');
+        $totalPrice = $price + session('travel_price') + session('location_price');
+
+        // Uppdatera bokningsdata
+        $bookingData = array_merge($bookingData, [
+            'date_time' => $dateTime,
+            'status' => 2,
+            'expected_time' => session('expected_time'),
+            'price' => $price,
+            'total_price' => $totalPrice,
+            'to_location_times' => session('travels', 1),
+            'special' => 1,
+            'special_text' => $request->input('special_text'),
+        ], $travelData);
+
+        DB::transaction(function () use ($bookingData, $request) {
+            $uniqueOrderId = Str::lower(Str::random(random_int(6, 8)));
+
+            $booking = Booking::create(array_merge($bookingData, ['order_id' => $uniqueOrderId]));
+
+            $addressData = [
+                'address' => session('address'),
+                'postal_code' => session('postal_code'),
+                'city' => session('city')
+            ];
+
+            $customerData = array_merge($request->only(['first_name', 'last_name', 'personal_number', 'email', 'phone', 'door_code', 'billing_method']), ['order_id' => $booking->order_id], $addressData);
+
+            $customer = Customers::create($customerData);
+
+            $booking->update(['customer_id' => $customer->id]);
+
+            if ($request->has('add_services')) {
+                $quantitiesInput = $request->input('service_quantity', []);
+                $optionsInput = $request->input('add_options', []);
+                $optionsQuantityInput = $request->input('add_option_quantity', []); // För att få kvantitet av valda alternativ
+                $ownMaterialsInput = $request->input('has_own_materials', []);
+
+                foreach ($request->input('add_services', []) as $serviceId) {
+                    $newService = new BookingService();
+                    $newService->service_id = $serviceId;
+                    $newService->booking_id = $booking->id;
+
+                    if (isset($quantitiesInput[$serviceId])) {
+                        $newService->quantity = $quantitiesInput[$serviceId];
+                    }
+
+                    // Kontrollera och spara de valda undertjänsterna
+                    if (isset($optionsInput) && is_array($optionsInput)) {
+                        $selectedServiceOptions = ServiceOption::whereIn('id', $optionsInput)->get()->toArray();
+                        $filteredOptions = [];
+
+                        foreach ($selectedServiceOptions as $option) {
+                            if ($option['has_quantity'] && isset($optionsQuantityInput[$option['id']])) {
+                                $option['quantity'] = $optionsQuantityInput[$option['id']];
+                            }
+                            $filteredOptions[] = $option;
+                        }
+
+                        $newService->service_options = json_encode($filteredOptions);
+                    }
+
+                    if (isset($ownMaterialsInput[$serviceId]) && $ownMaterialsInput[$serviceId] == 1) {
+                        $newService->has_own_materials = 1;
+                    } else {
+                        $newService->has_own_materials = 0;
+                    }
+
+                    $newService->save();
+                }
+            }
+
+            $info['sms'] = null;
+            $info['sms'] .= "Din bokning har blivit skapad! \n\n";
+            $info['sms'] .= "Boknings-ID: " . $booking->order_id . " \n";
+            $info['sms'] .= "Adress: " . $customer->address . " \n";
+            $info['sms'] .= "Datum: " . Carbon::parse($booking->date_time)->format('d/m-y H:i') . " \n\n";
+            $info['sms'] .= "Du kommer att faktureras via Frilans Finans som du kan läsa mer om här: \n";
+            $info['sms'] .= "https://frilansfinans.se/fakturamottagare";
+
+            $sms = array(
+                'from' => 'Fixihem',   /* Can be up to 11 alphanumeric characters */
+                'to' => check_number($customer->phone),  /* The mobile number you want to send to */
+                'message' => $info['sms'],
+            );
+            echo sendSMS($sms) . "\n";
+        });
+
+        session()->forget(['services', 'options', 'service_quantity', 'has_material', 'option_quantity', 'toralPrice', 'price', 'expected_time', 'serviceData', 'comments', 'travels', 'location_distance', 'location_duration', 'location_price', 'location_name', 'location_address', 'travel_duration', 'travel_distance', 'travel_price']);
+
+        return redirect()->route('dashboard')->with('status', 'Din bokning har skapats! Du kommer få ett bekräftelse sms när den setts över.');
+
+    }
+
+    public function saveTime(Request $request)
+    {
+        $hours = $request->input('hours');
+        $minutes = $request->input('minutes');
+
+        // Räkna ut totala antalet minuter:
+        $total_minutes = ($hours * 60) + $minutes;
+
+        // Spara i session:
+        session(['expected_time' => $total_minutes]);
+
+        // Spara till databasen om så önskas:
+        // Exempel:
+        // $user = Auth::user();
+        // $user->expected_time = $total_minutes;
+        // $user->save();
+
+        // Vidarebefordra användaren till en önskad plats:
+        return redirect()->back()->with('message', 'Tid sparad!');
+    }
+
+    public function saveAddress(Request $request)
+    {
+        session()->forget(['location_distance', 'location_duration', 'location_price', 'location_name', 'location_address', 'location_times']);
+
+        $address = $request->input('address');
+        $city = $request->input('city');
+        $postalCode = $request->input('postal_code');
+
+        // Spara adressinformationen i sessionen
+        session(['address' => $address]);
+        session(['city' => $city]);
+        session(['postal_code' => $postalCode]);
+
+        $fullAddress = "${address}, ${city}, ${postalCode}, Sverige";
+        $origin = 'Rådmansgatan 4, Karlstad, 65462, Sverige';
+
+        $response = Http::get('https://maps.googleapis.com/maps/api/directions/json', [
+            'origin' => $origin,
+            'destination' => $fullAddress,
+            'mode' => 'car',
+            'language' => 'sv-SE',
+            'key' => 'AIzaSyAz9ZZf4KGBMl-zdh4MBJri6k-3E6VPCgY'
+        ]);
+
+        $distanceInMeters1 = $response->json()['routes'][0]['legs'][0]['distance']['value'];
+        $distanceInKilometers1 = $distanceInMeters1 / 1000;
+
+        $durationInSeconds1 = $response->json()['routes'][0]['legs'][0]['duration']['value'];
+        $durationInMinutes1 = $durationInSeconds1 / 60;
+
+        // Räkna ut priset baserat på 10 kr/km
+        $price1 = $distanceInKilometers1 * 10;
+
+        // Spara distans, restid och pris i sessionen
+        session(['travel_distance' => $distanceInKilometers1]);
+        session(['travel_duration' => $durationInMinutes1]);
+        session(['travel_price' => $price1]);
+
+        if ($request->input('recycling')) {
+            $travels = $request->input('to_location_times');
+
+            // Kolla om antalet turer är större än 1. Om det är det, lägg till 15 minuter för varje extra tur.
+            $extraTime = ($travels > 1) ? ($travels - 1) * 30 : 0;
+
+            // Hämta det nuvarande värdet av 'expected_time' från sessionen
+            $expectedTime = session('expected_time', 0); // om 'expected_time' inte finns, använd 0 som default
+            $expectedTime += $extraTime;
+
+            // Hämta den tidigare sparade datan från sessionen
+            $servicesData = session('servicesData');
+
+            // Spara all relevant data i sessionen
+            session([
+                'travels' => $travels,
+                'expected_time' => $expectedTime, // Spara den uppdaterade 'expected_time'
+                'servicesData' => $servicesData
+            ]);
+
+            $driveLocations = DriveLocations::where('type', 'recycling')
+                ->get();
+
+            $nearestLocation = null;
+            $shortestDistance = PHP_INT_MAX;
+            $shortestDuration = PHP_INT_MAX;
+
+            foreach ($driveLocations as $location) {
+                $response = Http::get('https://maps.googleapis.com/maps/api/directions/json', [
+                    'origin' => $origin,
+                    'destination' => $fullAddress,
+                    'mode' => 'car',
+                    'language' => 'sv-SE',
+                    'key' => 'AIzaSyAz9ZZf4KGBMl-zdh4MBJri6k-3E6VPCgY'
+                ]);
+
+                $distanceInMeters = $response->json()['routes'][0]['legs'][0]['distance']['value'];
+                $durationInSeconds = $response->json()['routes'][0]['legs'][0]['duration']['value'];
+
+                if ($distanceInMeters < $shortestDistance) {
+                    $shortestDistance = $distanceInMeters;
+                    $shortestDuration = $durationInSeconds;
+                    $nearestLocation = $location;
+                }
+
+                sleep(1); // Väntar i en sekund
+            }
+
+            $distanceInKilometers = $shortestDistance / 1000;
+            $durationInMinutes = $shortestDuration / 60;
+            $price = $distanceInKilometers * 10;
+
+            // Spara distans, restid och pris i sessionen med prefix "location_"
+            session([
+                'location_distance' => $distanceInKilometers,
+                'location_duration' => $durationInMinutes,
+                'location_price' => $price,
+                'location_name' => $nearestLocation->name,
+                'location_address' => $nearestLocation->address
+            ]);
+        }
+
+        // Vidarebefordra användaren till en önskad plats:
+        return redirect()->back()->with('message', 'Adress sparad!');
     }
 
     public function today()
@@ -378,7 +632,8 @@ class AdminController extends Controller
         return view('admin.order_edit', compact('order', 'categories', 'driveLocations'));
     }
 
-    public function order_edit_submit(Request $request) {
+    public function order_edit_submit(Request $request)
+    {
         $order = Booking::where('order_id', $request->order_id)->first();
 
         $dateInput = $request->input('date');
@@ -516,12 +771,11 @@ class AdminController extends Controller
         }
 
 
-
         // 4. Handle removing services
-        if($request->has('remove_services')) {
+        if ($request->has('remove_services')) {
             foreach ($request->input('remove_services', []) as $serviceId) {
                 $serviceToRemove = $order->services()->where('id', $serviceId)->first();
-                if($serviceToRemove) {
+                if ($serviceToRemove) {
                     $serviceToRemove->delete();
                 }
             }
@@ -551,10 +805,8 @@ class AdminController extends Controller
         $order->save();
 
 
-
         return redirect()->back()->with('success', 'Order updated successfully!');
     }
-
 
 
 }

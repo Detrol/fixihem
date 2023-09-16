@@ -130,6 +130,13 @@
                         </li>
 
                         <li class="nav-item">
+                            <a class="nav-link" href="{{ route('special') }}">
+                                <i class="fa-solid fa-house fa-fw"></i>
+                                <span>Specialbokning</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
                             <a class="nav-link" href="#">
                                 <i class="fa-regular fa-calendar-clock fa-fw"></i>
                                 <span>Bokningar</span>

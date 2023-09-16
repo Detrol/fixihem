@@ -53,10 +53,15 @@ Route::get('/admin/login', [AdminController::class, 'showLoginForm'])->name('adm
 Route::post('/admin/login', [AdminController::class, 'login'])->name('admin.login');
 
 Route::prefix('admin')->middleware('is.admin', 'AdminMiddleware')->group(function () {
-    Route::get('/', [AdminController::class, 'index']);
+    Route::get('/', [AdminController::class, 'index'])->name('dashboard');
     Route::get('today', [AdminController::class, 'today'])->name('today');
     Route::get('reserved', [AdminController::class, 'reserved'])->name('reserved');
     Route::get('bookings/{status}', [AdminController::class, 'bookings'])->name('bookings');
+
+    Route::get('special', [AdminController::class, 'special'])->name('special');
+    Route::post('special-post', [AdminController::class, 'specialPost'])->name('special-post');
+    Route::post('save-time', [AdminController::class, 'saveTime'])->name('save-time');
+    Route::post('save-address', [AdminController::class, 'saveAddress'])->name('save-address');
 
     Route::get('order_details', [AdminController::class, 'order_details'])->name('order_details');
     Route::get('order/{order}/invoice-text', [AdminController::class, 'generateInvoiceText'])->name('admin.order.invoice-text');

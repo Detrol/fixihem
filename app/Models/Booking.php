@@ -26,7 +26,9 @@ class Booking extends Model
         'email_reminder',
         'sms_reminder',
         'status',
-        'to_location_times'
+        'to_location_times',
+        'special',
+        'special_text'
     ];
 
     public function getStatusNameAttribute() {
