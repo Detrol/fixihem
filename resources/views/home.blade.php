@@ -60,7 +60,7 @@
         <div class="overflow-hidden">
             <div class="container content-space-2 content-space-lg-3">
                 <h2>Vad önskar du hjälp med?</h2>
-                <h5>Om du önskar hjälp med något som inte finns i listan nedan, kontakta mig gärna via bokningsformuläret längst ned på sidan.</h5>
+                <p class="text-muted">Om du önskar hjälp med något som inte finns i listan nedan, kontakta mig gärna via bokningsformuläret längst ned på sidan.</p>
 
                 <div class="small pb-4">
                     Innan du bokar mina tjänster, vänligen beakta följande:
