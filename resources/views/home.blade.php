@@ -58,7 +58,7 @@
 
         <!-- Features -->
         <div class="overflow-hidden">
-            <div class="container content-space-2 content-space-lg-3">
+            <div class="container content-space-2 content-space-lg-1">
                 <h2 class="mb-0">Vad önskar du hjälp med?</h2>
                 <p class="text-muted">Om du önskar hjälp med något som inte finns i listan nedan, kontakta mig gärna via bokningsformuläret längst ned på sidan.</p>
 
