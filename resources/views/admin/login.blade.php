@@ -24,6 +24,12 @@
                                     <label>Password:</label>
                                     <input type="password" name="password" class="form-control" required>
                                 </div>
+                                <div class="form-group">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="remember" name="remember">
+                                        <label class="custom-control-label" for="remember">Kom ihåg mig</label>
+                                    </div>
+                                </div>
                                 <button type="submit" class="btn btn-primary">Login</button>
                             </form>
                         </div>
