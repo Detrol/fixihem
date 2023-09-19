@@ -516,6 +516,16 @@ class AdminController extends Controller
         return redirect()->back();
     }
 
+    public function order_paid(Request $request)
+    {
+        $order = Booking::where('order_id', $request->order_id)->first();
+        $order->date_paid = Carbon::now();
+        $order->status = 5;
+        $order->save();
+
+        return redirect()->back();
+    }
+
     public function order_start_time(Request $request)
     {
         $order = Booking::where('order_id', $request->order_id)->first();

@@ -17,7 +17,7 @@
     Faktureras via: {{ $order->customer->billing_method }}<br><br>
 
     # Pris<br>
-    Timpris: 299 kr/timme<br><br>
+    Timpris: 249 kr/timme<br><br>
 
     # Tid<br>
     Start: {{ $order->start_time }}<br>
