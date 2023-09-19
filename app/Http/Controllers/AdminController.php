@@ -507,6 +507,15 @@ class AdminController extends Controller
 
     }
 
+    public function order_invoiced(Request $request)
+    {
+        $order = Booking::where('order_id', $request->order_id)->first();
+        $order->status = 4;
+        $order->save();
+
+        return redirect()->back();
+    }
+
     public function order_start_time(Request $request)
     {
         $order = Booking::where('order_id', $request->order_id)->first();
